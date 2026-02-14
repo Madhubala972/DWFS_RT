@@ -2,79 +2,85 @@
 
 A centralized digital platform for transparent disaster welfare distribution. This system connects affected users, administrators, NGOs, and volunteers to streamline the process of requesting, verifying, and delivering aid.
 
-## Features
+# Tech Stack
 
--   **Role-Based Access Control**:
-    -   **Affected User**: Register and submit help requests for food, funds, medical aid, etc.
-    -   **NGO / Volunteer**: View approved requests, assign tasks to themselves, and mark delivery status.
-    -   **Administrator**: Verify users and approve requests.
--   **AI-Powered Prioritization**:
-    -   Integrated AI service analyzes request descriptions to automatically assign priority (Low, Medium, High, Critical) based on urgency.
--   **Transparency**:
-    -   Activity logs track all major actions (Registration, Login, Request Creation, Status Updates).
--   **Real-time Dashboard**:
-    -   Status tracking from 'Pending' -> 'Approved' -> 'Assigned' -> 'Delivered'.
+- **Backend**: Node.js + Express
+- **Frontend**: React (Vite)
+- **Database**: MongoDB (Mongoose)
+- **AI Service**: Python (Flask)
+- **Authentication**: JWT (JSON Web Tokens)
+- **Styling**: TailwindCSS v3
 
-## Tech Stack
+# Prerequisites
 
--   **Frontend**: React (Vite), TailwindCSS v3
--   **Backend**: Node.js, Express.js, MongoDB (Mongoose)
--   **AI Service**: Python, Flask
--   **Authentication**: JWT (JSON Web Tokens)
+- **Node.js**: v14+
+- **Python**: v3.8+
+- **MongoDB**: v4.4+ (Running locally on default port 27017)
+- **npm** or **yarn**
 
-## Prerequisites
+# Quick Start
 
--   Node.js (v14+)
--   Python (v3.8+)
--   MongoDB (Running locally on default port 27017)
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Madhubala972/Transparent_public_welfare_distribution.git
+cd Transparent_public_welfare_distribution
+```
 
-## Installation & Setup
-
-### 1. Backend Setup
-
+### 2. Setup Backend
 ```bash
 cd server
 npm install
-# Create .env file with:
-# PORT=5000
-# MONGO_URI=mongodb://localhost:27017/disaster_welfare
-# JWT_SECRET=your_secret_key
-# AI_SERVICE_URL=http://localhost:5001/predict
-
+# Create .env with PORT, MONGO_URI, JWT_SECRET, AI_SERVICE_URL
 npm start
 ```
 
-### 2. AI Service Setup
-
+### 3. Setup AI Service
 ```bash
 cd ai-service
-# Optional: Create virtual environment
-# python -m venv venv
-# source venv/bin/activate (Linux/Mac) or venv\Scripts\activate (Windows)
-
 pip install -r requirements.txt
 python app.py
 ```
 
-### 3. Frontend Setup
-
+### 4. Setup Frontend
 ```bash
 cd client
 npm install
 npm run dev
 ```
 
-## Usage
+# Project Structure
 
-1.  Open the frontend (e.g., `http://localhost:5173`).
-2.  Register a new account (Select Role: 'User', 'NGO', or 'Volunteer').
-3.  **User**: Log in and click "Request Help". Fill in details. Use keywords like "urgent" or "food" to test AI prioritization.
-4.  **NGO**: Log in to see the dashboard. You will see requests.
-    -   'Pending' requests can be **Approved**.
-    -   'Approved' requests can be **Assigned**.
-    -   'Assigned' requests can be marked **Delivered**.
+```text
+├── ai-service/          # Python Flask service for priority AI
+├── client/              # React frontend application
+├── server/              # Node.js backend API
+│   ├── config/          # DB connection configuration
+│   ├── controllers/     # API request handlers
+│   ├── middleware/      # Auth and error middleware
+│   ├── models/          # Mongoose schemas
+│   ├── routes/          # Express route definitions
+│   └── utils/           # Utility functions
+├── ARCHITECTURE.md      # System design and Mermaid diagrams
+├── CONTRIBUTING.md      # Git Flow and PR guidelines
+└── API_DOCUMENTATION.md # Backend API details
+```
 
-## Troubleshooting
+# API Documentation
 
--   **Tailwind CSS Error**: If you see an error about `@tailwindcss/postcss`, ensure you are using Tailwind v3. Run `npm install -D tailwindcss@3.4.17 postcss autoprefixer` in the `client` directory.
--   **MongoDB Connection**: Ensure your local MongoDB service is running.
+Detailed API endpoints and request/response examples can be found in [API_DOCUMENTATION.md](./API_DOCUMENTATION.md).
+
+# Database Schema
+
+The entity relationship diagrams and system flow are documented in [ARCHITECTURE.md](./ARCHITECTURE.md#1-entity-relationship-er-diagram).
+
+# Contributing
+
+Please review our [Contributing Guidelines](./CONTRIBUTING.md) for information on our Git Flow branching strategy and PR process.
+
+# License
+
+MIT
+
+# Contact
+
+For any queries or support, please contact the project maintainers.

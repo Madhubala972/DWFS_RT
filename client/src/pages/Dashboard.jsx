@@ -162,7 +162,7 @@ const Dashboard = () => {
                                 {['admin', 'ngo', 'volunteer'].includes(user.role) && (
                                     <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
                                         {/* Verification for Admin/NGO */}
-                                        {req.status === 'Pending' && ['admin', 'ngo'].includes(user.role) && (
+                                        {req.status === 'Pending' && ['admin', 'ngo', 'volunteer'].includes(user.role) && (
                                             <>
                                                 {req.priority === 'Critical' && user.role !== 'admin' ? (
                                                     <span className="text-xs text-red-500 italic">Critical needs Admin approval</span>
