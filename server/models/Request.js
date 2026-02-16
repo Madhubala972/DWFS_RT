@@ -30,13 +30,32 @@ const requestSchema = mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ['Pending', 'Verified', 'Approved', 'Assigned', 'Delivered', 'Rejected', 'Cancelled'],
+            // enum: ['Pending', 'Verified', 'Approved', 'Assigned', 'InProgress', 'Collected', 'Delivered', 'Rejected', 'Cancelled'],
             default: 'Pending',
         },
         priority: {
             type: String,
             enum: ['Low', 'Medium', 'High', 'Critical'],
-            default: 'Medium', // AI service will update this
+            default: 'Medium',
+        },
+        priorityScore: {
+            type: Number,
+            default: 0,
+        },
+        priorityExplanation: {
+            type: String,
+        },
+        incomeLevel: {
+            type: Number, // Monthly income
+        },
+        vulnerability: {
+            hasElderly: { type: Boolean, default: false },
+            hasDisabled: { type: Boolean, default: false },
+            familySize: { type: Number, default: 1 },
+        },
+        locationRisk: {
+            isFloodZone: { type: Boolean, default: false },
+            isDroughtArea: { type: Boolean, default: false },
         },
         assignedTo: { // Volunteer or NGO
             type: mongoose.Schema.Types.ObjectId,
@@ -53,6 +72,12 @@ const requestSchema = mongoose.Schema(
         },
         proofOfDelivery: {
             type: String, // URL to image/document
+        },
+        deliveryStartedAt: {
+            type: Date,
+        },
+        deliveredAt: {
+            type: Date,
         },
     },
     {

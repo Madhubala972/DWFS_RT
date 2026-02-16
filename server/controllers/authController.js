@@ -59,7 +59,7 @@ const loginUser = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (user && (await user.matchPassword(password))) {
-            await logActivity(user._id, 'LOGIN', 'User logged in', user._id, 'User', req.ip);
+            await logActivity(user._id, 'LOGIN', 'User logged in successfully', user._id, 'User', req.ip);
             res.json({
                 _id: user._id,
                 name: user.name,
@@ -68,8 +68,24 @@ const loginUser = async (req, res) => {
                 token: generateToken(user._id, user.role),
             });
         } else {
+            // Log failed attempt if user exists, otherwise log anonymous failure
+            if (user) {
+                await logActivity(user._id, 'LOGIN_FAILURE', `Failed login attempt for ${email}`, user._id, 'User', req.ip);
+            }
             res.status(401).json({ message: 'Invalid email or password' });
         }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Logout user
+// @route   POST /api/auth/logout
+// @access  Private
+const logoutUser = async (req, res) => {
+    try {
+        await logActivity(req.user._id, 'LOGOUT', 'User logged out', req.user._id, 'User', req.ip);
+        res.json({ message: 'Logged out successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -81,4 +97,4 @@ const generateToken = (id, role) => {
     });
 };
 
-module.exports = { registerUser, loginUser };
+module.exports = { registerUser, loginUser, logoutUser };

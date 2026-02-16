@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
+import UrgentNeedsModal from '../components/UrgentNeedsModal';
 
 const Home = () => {
     return (
         <div className="min-h-screen bg-light">
+            <UrgentNeedsModal />
             {/* Hero Section */}
             <div className="bg-primary text-white py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -41,27 +43,30 @@ const Home = () => {
             <div className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-12">
                     <h2 className="text-3xl font-bold text-gray-900 mb-4">About the Platform</h2>
-                    <p className="text-gray-600 max-w-2xl mx-auto">
+                    <p className="text-gray-600 max-w-2xl mx-auto mb-6">
                         We bridge the gap between disaster victims, relief agencies, and volunteers. Our AI-driven system prioritizes requests based on urgency, ensuring that help reaches the most critical cases first. Transparency is at our core, with real-time tracking from request to delivery.
                     </p>
+                    <Link to="/analytics" className="inline-block bg-white text-primary border border-primary px-6 py-2 rounded-full font-medium hover:bg-blue-50 transition">
+                        View Real-time Analytics
+                    </Link>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div className="card text-center hover:shadow-xl transition-shadow bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <Link to="/dashboard" className="card text-center hover:shadow-xl transition-shadow bg-white p-6 rounded-lg shadow-sm border border-gray-100 cursor-pointer block">
                         <div className="text-secondary text-5xl mb-4">🛡️</div>
                         <h3 className="text-xl font-bold mb-2">Verified Requests</h3>
                         <p className="text-gray-600">Every request is verified by administrators to prevent fraud and ensure fair distribution.</p>
-                    </div>
-                    <div className="card text-center hover:shadow-xl transition-shadow bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    </Link>
+                    <Link to="/track-delivery" className="card text-center hover:shadow-xl transition-shadow bg-white p-6 rounded-lg shadow-sm border border-gray-100 cursor-pointer block">
                         <div className="text-accent text-5xl mb-4">🚚</div>
                         <h3 className="text-xl font-bold mb-2">Track Delivery</h3>
                         <p className="text-gray-600">Real-time tracking of aid from dispatch to delivery with proof of completion.</p>
-                    </div>
-                    <div className="card text-center hover:shadow-xl transition-shadow bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    </Link>
+                    <Link to="/analytics" className="card text-center hover:shadow-xl transition-shadow bg-white p-6 rounded-lg shadow-sm border border-gray-100 cursor-pointer block">
                         <div className="text-primary text-5xl mb-4">🎯</div>
                         <h3 className="text-xl font-bold mb-2">AI Prioritization</h3>
                         <p className="text-gray-600">Smart algorithms prioritize critical needs to ensure urgent cases are handled first.</p>
-                    </div>
+                    </Link>
                 </div>
             </div>
         </div>

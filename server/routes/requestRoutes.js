@@ -5,9 +5,14 @@ const {
     getRequests,
     getMyRequests,
     updateRequest,
-    getRequestById
+    getRequestById,
+    getPublicStats,
+    getPublicRequestStatus
 } = require('../controllers/requestController');
 const { protect, authorize } = require('../middleware/authMiddleware');
+
+router.get('/stats', getPublicStats);
+router.get('/track/:id', getPublicRequestStatus);
 
 router.route('/')
     .post(protect, createRequest)

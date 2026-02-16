@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import axios from 'axios';
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -8,10 +9,21 @@ const Navbar = () => {
     // Mock auth state for now
     const user = JSON.parse(localStorage.getItem('user'));
 
-    const handleLogout = () => {
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-        navigate('/login');
+    const handleLogout = async () => {
+        try {
+            if (user && user.token) {
+                const config = {
+                    headers: { Authorization: `Bearer ${user.token}` },
+                };
+                await axios.post('http://localhost:5000/api/auth/logout', {}, config);
+            }
+        } catch (error) {
+            console.error('Logout logging failed', error);
+        } finally {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            navigate('/login');
+        }
     };
 
     return (
@@ -28,7 +40,10 @@ const Navbar = () => {
                             <>
                                 <Link to="/dashboard" className="text-gray-700 hover:text-primary">Dashboard</Link>
                                 {user.role === 'admin' && (
-                                    <Link to="/analytics" className="text-gray-700 hover:text-primary">Analytics</Link>
+                                    <>
+                                        <Link to="/analytics" className="text-gray-700 hover:text-primary">Analytics</Link>
+                                        <Link to="/ai-strategy" className="text-gray-700 hover:text-primary">AI Strategy</Link>
+                                    </>
                                 )}
                                 <Link to="/request-help" className="text-gray-700 hover:text-primary">Request Help</Link>
                                 <button onClick={handleLogout} className="text-red-600 hover:text-red-800">Logout</button>
@@ -64,7 +79,10 @@ const Navbar = () => {
                             <>
                                 <Link to="/dashboard" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Dashboard</Link>
                                 {user.role === 'admin' && (
-                                    <Link to="/analytics" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Analytics</Link>
+                                    <>
+                                        <Link to="/analytics" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Analytics</Link>
+                                        <Link to="/ai-strategy" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">AI Strategy</Link>
+                                    </>
                                 )}
                                 <Link to="/request-help" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Request Help</Link>
                                 <button onClick={handleLogout} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-gray-50">Logout</button>
