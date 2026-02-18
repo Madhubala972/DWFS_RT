@@ -88,79 +88,28 @@ const Analytics = () => {
                 </div>
             </div>
 
-            {/* Lifecycle Line Graphs */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                {/* 1. Request Creation Timeline */}
-                <div className="bg-white p-6 rounded-3xl shadow-xl border border-blue-50">
-                    <h3 className="text-sm font-black text-blue-600 uppercase tracking-widest mb-4 flex items-center gap-2">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                        Request Influx
-                    </h3>
-                    <div className="h-48 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={timelineData}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis dataKey="date" hide />
-                                <YAxis hide />
-                                <Tooltip
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                                />
-                                <Line type="monotone" dataKey="requests" stroke="#3b82f6" strokeWidth={4} dot={{ r: 4, fill: '#3b82f6' }} />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </div>
-                    <p className="mt-4 text-2xl font-black text-gray-800">{timelineData.reduce((acc, curr) => acc + curr.requests, 0)}</p>
-                    <p className="text-xs text-gray-400 font-bold uppercase">New Requests (7D)</p>
-                </div>
-
-                {/* 2. Processing Timeline */}
-                <div className="bg-white p-6 rounded-3xl shadow-xl border border-orange-50">
-                    <h3 className="text-sm font-black text-orange-600 uppercase tracking-widest mb-4 flex items-center gap-2">
-                        <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                        Inventory Movement
-                    </h3>
-                    <div className="h-48 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={timelineData}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis dataKey="date" hide />
-                                <YAxis hide />
-                                <Tooltip
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                                />
-                                <Line type="monotone" dataKey="processing" stroke="#f97316" strokeWidth={4} dot={{ r: 4, fill: '#f97316' }} />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </div>
-                    <p className="mt-4 text-2xl font-black text-gray-800">{timelineData.reduce((acc, curr) => acc + curr.processing, 0)}</p>
-                    <p className="text-xs text-gray-400 font-bold uppercase">In Processing (7D)</p>
-                </div>
-
-                {/* 3. Delivery Success Timeline */}
-                <div className="bg-white p-6 rounded-3xl shadow-xl border border-green-50">
-                    <h3 className="text-sm font-black text-green-600 uppercase tracking-widest mb-4 flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        Successful Deliveries
-                    </h3>
-                    <div className="h-48 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={timelineData}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis dataKey="date" hide />
-                                <YAxis hide />
-                                <Tooltip
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                                />
-                                <Line type="monotone" dataKey="delivery" stroke="#22c55e" strokeWidth={4} dot={{ r: 4, fill: '#22c55e' }} />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </div>
-                    <p className="mt-4 text-2xl font-black text-gray-800">{timelineData.reduce((acc, curr) => acc + curr.delivery, 0)}</p>
-                    <p className="text-xs text-gray-400 font-bold uppercase">Completed (7D)</p>
+            {/* Trends Section */}
+            <div className="bg-white p-6 rounded-lg shadow-md mb-12">
+                <h2 className="text-xl font-bold mb-6 text-gray-700 border-b pb-2">Delivery Trends (Last 7 Days)</h2>
+                <div className="h-96 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={timelineData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                            <XAxis
+                                dataKey="date"
+                                stroke="#6b7280"
+                                tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            />
+                            <YAxis stroke="#6b7280" />
+                            <Tooltip
+                                contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                            />
+                            <Legend verticalAlign="top" height={36} />
+                            <Line type="monotone" dataKey="delivery" name="Completed Deliveries" stroke="#22c55e" strokeWidth={4} activeDot={{ r: 8 }} />
+                        </LineChart>
+                    </ResponsiveContainer>
                 </div>
             </div>
-
-
             {/* Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Priority Distribution */}
@@ -185,20 +134,70 @@ const Analytics = () => {
                 </div>
 
                 {/* Request Types */}
-                <div className="bg-white p-6 rounded-lg shadow-md lg:col-span-2">
-                    <h2 className="text-xl font-bold mb-6 text-gray-700 border-b pb-2">Requests by Type</h2>
-                    <div className="h-80 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={typeData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                                <Tooltip />
-                                <Legend />
-                                <Bar dataKey="value" fill="#82ca9d" name="Number of Requests" barSize={40} />
-                            </BarChart>
-                        </ResponsiveContainer>
+            </div>
+
+            {/* Verification & Fairness Insights */}
+            <div className="bg-white p-6 rounded-lg shadow-md lg:col-span-2 mt-8 mb-12">
+                <div className="flex items-center justify-between border-b pb-4 mb-6">
+                    <div>
+                        <h2 className="text-xl font-bold text-gray-700 flex items-center gap-2">
+                            <span className="text-blue-500">🛡️</span> Verified Requests Analysis
+                        </h2>
+                        <p className="text-sm text-gray-500 mt-1">
+                            Ensuring fairness and trust by validating every request before distribution.
+                        </p>
                     </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    {/* Pending Verification */}
+                    <div className="bg-yellow-50 rounded-xl p-6 border border-yellow-100 flex flex-col items-center text-center shadow-sm">
+                        <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mb-3">
+                            <span className="text-2xl">⏳</span>
+                        </div>
+                        <h3 className="text-lg font-semibold text-yellow-800 mb-1">Pending Verification</h3>
+                        <p className="text-xs text-yellow-600 mb-2 uppercase tracking-wide font-medium">Under Review</p>
+                        <span className="text-3xl font-bold text-yellow-900">
+                            {stats.byStatus ? (stats.byStatus['Pending'] || 0) : 0}
+                        </span>
+                    </div>
+
+                    {/* Verified & Active */}
+                    <div className="bg-blue-50 rounded-xl p-6 border border-blue-100 flex flex-col items-center text-center shadow-sm">
+                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
+                            <span className="text-2xl">✅</span>
+                        </div>
+                        <h3 className="text-lg font-semibold text-blue-800 mb-1">Verified & Approved</h3>
+                        <p className="text-xs text-blue-600 mb-2 uppercase tracking-wide font-medium">Authenticity Checked</p>
+                        <span className="text-3xl font-bold text-blue-900">
+                            {stats.byStatus ? ['Verified', 'Approved', 'Assigned', 'InProgress', 'Collected', 'Delivered']
+                                .reduce((sum, status) => sum + (stats.byStatus[status] || 0), 0) : 0}
+                        </span>
+                    </div>
+
+                    {/* Rejected */}
+                    <div className="bg-red-50 rounded-xl p-6 border border-red-100 flex flex-col items-center text-center shadow-sm">
+                        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-3">
+                            <span className="text-2xl">❌</span>
+                        </div>
+                        <h3 className="text-lg font-semibold text-red-800 mb-1">Rejected</h3>
+                        <p className="text-xs text-red-600 mb-2 uppercase tracking-wide font-medium">Flagged Invalid/Fraud</p>
+                        <span className="text-3xl font-bold text-red-900">
+                            {stats.byStatus ? (stats.byStatus['Rejected'] || 0) : 0}
+                        </span>
+                    </div>
+                </div>
+
+                <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                    <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <span>🤖</span> Fraud Detection & AI Verification Process:
+                    </h4>
+                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 list-disc list-inside text-sm text-gray-600">
+                        <li>AI automatically checks for duplicate requests and unusual patterns.</li>
+                        <li>Identity proofs (Aadhaar/ID) and income details are cross-referenced.</li>
+                        <li>Location proof via geolocation ensures aid reaches the right area.</li>
+                        <li>Only verified requests move to the prioritization queue for distribution.</li>
+                    </ul>
                 </div>
             </div>
         </div>

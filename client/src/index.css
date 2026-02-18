@@ -6,11 +6,16 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  @apply bg-gray-50 text-gray-900;
+  @apply bg-gray-50 text-gray-900 antialiased selection:bg-blue-100 selection:text-blue-900;
+}
+
+/* Glassmorphism Utility */
+.glass {
+  @apply backdrop-blur-md bg-white/80 border border-white/50 shadow-lg;
 }
 
 .card {
-  @apply bg-white p-6 rounded-lg shadow-md border border-gray-100;
+  @apply bg-white p-6 rounded-xl shadow-sm border border-gray-100 transition-all hover:shadow-md;
 }
 
 .btn-primary {

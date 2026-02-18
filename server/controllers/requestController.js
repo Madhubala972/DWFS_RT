@@ -279,8 +279,33 @@ const getPublicStats = asyncHandler(async (req, res) => {
     };
 
     const requestTimeline = await getTimeline('createdAt');
-    const processingTimeline = await getTimeline('deliveryStartedAt');
-    const deliveryTimeline = await getTimeline('deliveredAt');
+
+    // Custom timeline logic for Deliveries (Robust Fallback)
+    const deliveryTimeline = await Request.aggregate([
+        {
+            $match: {
+                status: 'Delivered',
+                updatedAt: { $gte: sevenDaysAgo }
+            }
+        },
+        {
+            $project: {
+                date: {
+                    $dateToString: {
+                        format: "%Y-%m-%d",
+                        date: { $ifNull: ["$deliveredAt", "$updatedAt"] }
+                    }
+                }
+            }
+        },
+        {
+            $group: {
+                _id: "$date",
+                count: { $sum: 1 }
+            }
+        },
+        { $sort: { _id: 1 } }
+    ]);
 
     // Helper to merge timelines into a single dataset for line charts
     const dates = [];
@@ -294,7 +319,6 @@ const getPublicStats = asyncHandler(async (req, res) => {
     const timeline = dates.map(date => ({
         date,
         requests: requestTimeline.find(t => t._id === date)?.count || 0,
-        processing: processingTimeline.find(t => t._id === date)?.count || 0,
         delivery: deliveryTimeline.find(t => t._id === date)?.count || 0
     }));
 
@@ -303,8 +327,7 @@ const getPublicStats = asyncHandler(async (req, res) => {
     const roleStats = await Request.aggregate([
         {
             $match: {
-                status: { $in: ['Assigned', 'Delivered'] },
-                assignedTo: { $exists: true, $ne: null }
+                status: { $in: ['Assigned', 'Delivered'] }
             }
         },
         {
@@ -315,12 +338,19 @@ const getPublicStats = asyncHandler(async (req, res) => {
                 as: 'assignedUser'
             }
         },
-        { $unwind: '$assignedUser' },
+        {
+            $project: {
+                status: 1,
+                role: {
+                    $ifNull: [{ $arrayElemAt: ["$assignedUser.role", 0] }, "admin"]
+                }
+            }
+        },
         {
             $group: {
                 _id: {
                     status: "$status",
-                    role: "$assignedUser.role"
+                    role: "$role"
                 },
                 count: { $sum: 1 }
             }
@@ -328,27 +358,72 @@ const getPublicStats = asyncHandler(async (req, res) => {
     ]);
 
     const fulfillmentStats = {
-        accepted: { volunteer: 0, ngo: 0 },
-        delivered: { volunteer: 0, ngo: 0 }
+        accepted: { volunteer: 0, ngo: 0, admin: 0 },
+        delivered: { volunteer: 0, ngo: 0, admin: 0 }
     };
 
     roleStats.forEach(item => {
         const { status, role } = item._id;
+        const normalizedRole = role ? role.toLowerCase() : 'admin'; // Fallback to admin if role is missing/null
         const count = item.count;
 
         if (status === 'Assigned') { // 'Assigned' means Accepted/In Progress
-            if (role === 'volunteer') fulfillmentStats.accepted.volunteer = count;
-            if (role === 'ngo') fulfillmentStats.accepted.ngo = count;
+            if (fulfillmentStats.accepted[normalizedRole] !== undefined) {
+                fulfillmentStats.accepted[normalizedRole] += count; // Accumulate counts
+            }
         } else if (status === 'Delivered') {
-            if (role === 'volunteer') fulfillmentStats.delivered.volunteer = count;
-            if (role === 'ngo') fulfillmentStats.delivered.ngo = count;
+            if (fulfillmentStats.delivered[normalizedRole] !== undefined) {
+                fulfillmentStats.delivered[normalizedRole] += count; // Accumulate counts
+            }
         }
     });
 
-    // (roleStats processing block ended above)
-    // Removed duplicate code here
+    // 7. Average Completion Time (Efficiency Analysis)
+    const completionEfficiency = await Request.aggregate([
+        {
+            $match: {
+                status: 'Delivered',
+                createdAt: { $exists: true }
+            }
+        },
+        {
+            $project: {
+                duration: {
+                    $subtract: [
+                        { $ifNull: ["$deliveredAt", "$updatedAt"] },
+                        "$createdAt"
+                    ]
+                }
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                avgDuration: { $avg: "$duration" },
+                minDuration: { $min: "$duration" },
+                maxDuration: { $max: "$duration" }
+            }
+        }
+    ]);
 
-    // 7. Recent Urgent Requests (Top 5 Critical/High)
+
+
+    const formatDuration = (ms) => {
+        if (ms < 0) return '0m'; // Safety for bad data
+        const hours = Math.floor(ms / (1000 * 60 * 60));
+        const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+        if (hours > 0) return `${hours}h ${minutes}m`;
+        if (minutes > 0) return `${minutes}m`;
+        return 'Less than 1m';
+    };
+
+    const efficiency = completionEfficiency.length > 0 ? {
+        avg: formatDuration(completionEfficiency[0].avgDuration),
+        fastest: formatDuration(completionEfficiency[0].minDuration),
+        slowest: formatDuration(completionEfficiency[0].maxDuration)
+    } : null;
+
+    // 8. Recent Urgent Requests (Top 5 Critical/High)
     const urgentRequests = await Request.find({
         status: 'Pending',
         priority: { $in: ['Critical', 'High'] }
@@ -364,6 +439,7 @@ const getPublicStats = asyncHandler(async (req, res) => {
         byType,
         timeline,
         fulfillmentStats,
+        completionEfficiency: efficiency,
         urgentRequests
     });
 });

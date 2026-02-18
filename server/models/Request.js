@@ -85,6 +85,13 @@ const requestSchema = mongoose.Schema(
     }
 );
 
+// Indexes for Scalability & Performance
+requestSchema.index({ status: 1 });
+requestSchema.index({ priority: 1 });
+requestSchema.index({ user: 1 });
+requestSchema.index({ assignedTo: 1 });
+requestSchema.index({ createdAt: -1 }); // Optimize timeline & recent queries
+
 const Request = mongoose.model('Request', requestSchema);
 
 module.exports = Request;
