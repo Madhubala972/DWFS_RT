@@ -48,10 +48,13 @@ const Register = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 card">
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-md w-full space-y-6 bg-white p-8 rounded-xl shadow-lg border border-gray-100">
                 <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Create an Account</h2>
+                    <h2 className="text-center text-3xl font-extrabold text-gray-900">
+                        Create Account
+                    </h2>
+                    <p className="text-center text-gray-600 mt-2 text-sm">Join the transparent relief network</p>
                 </div>
                 <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
                     <input name="name" type="text" required className="input-field" placeholder="Full Name" onChange={handleChange} />
@@ -60,10 +63,9 @@ const Register = () => {
                     <input name="phone" type="text" required className="input-field" placeholder="Phone Number" onChange={handleChange} />
 
                     <select name="role" className="input-field" onChange={handleChange} value={formData.role}>
-                        <option value="user">affected User</option>
+                        <option value="user">Affected User</option>
                         <option value="volunteer">Volunteer</option>
                         <option value="ngo">NGO</option>
-                        {/* Admin registration usually done separately or via seed script */}
                     </select>
 
                     <div className="grid grid-cols-2 gap-2">
@@ -74,8 +76,8 @@ const Register = () => {
                     <input name="zip" type="text" required className="input-field" placeholder="Zip Code" onChange={handleChange} />
 
                     <button type="submit" className="w-full btn-primary">Register</button>
-                    <div className="text-center">
-                        <Link to="/login" className="font-medium text-primary hover:text-indigo-500">
+                    <div className="text-center pt-2">
+                        <Link to="/login" className="font-semibold text-blue-600 hover:text-blue-700 transition">
                             Already have an account? Login
                         </Link>
                     </div>

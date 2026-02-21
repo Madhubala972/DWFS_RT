@@ -7,11 +7,11 @@ export default {
     theme: {
         extend: {
             colors: {
-                primary: '#3b82f6', // Optimized blue
-                secondary: '#10b981', // Optimized green
-                accent: '#f59e0b', // Optimized amber
-                dark: '#1f2937',
-                light: '#f3f4f6',
+                primary: '#1e3a8a', // Deep Royal Blue
+                secondary: '#22d3ee', // Bright Cyan Accent
+                accent: '#7c3aed', // Deep Purple
+                dark: '#0f172a',
+                light: '#f8fafc',
             },
             fontFamily: {
                 sans: ['Inter', 'sans-serif'],

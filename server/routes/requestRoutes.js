@@ -5,10 +5,12 @@ const {
     getRequests,
     getMyRequests,
     updateRequest,
-    getRequestById,
+    getRequestById
+} = require('../controllers/requestController');
+const {
     getPublicStats,
     getPublicRequestStatus
-} = require('../controllers/requestController');
+} = require('../controllers/statsController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 router.get('/stats', getPublicStats);

@@ -99,63 +99,61 @@ const UrgentNeedsModal = () => {
     return (
         <AnimatePresence>
             <motion.div
-                initial={{ x: 100, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: 100, opacity: 0 }}
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 50, opacity: 0 }}
                 className="fixed bottom-5 right-5 z-50 max-w-sm w-full"
             >
-                <div className="bg-white rounded-lg shadow-2xl p-6 border-l-8 border-red-500 relative">
-                    <button
-                        onClick={() => setIsVisible(false)}
-                        className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
-                    >
-                        ✕
-                    </button>
-
-                    <div className="flex items-center mb-3">
-                        <span className="text-3xl mr-3">
-                            {user?.role === 'admin' ? '📋' : '🚨'}
-                        </span>
-                        <h2 className="text-xl font-bold text-red-600">{title}</h2>
-                    </div>
-
-                    <p className="text-gray-700 mb-4 text-sm">
-                        {message}
-                    </p>
-
-                    {stats.urgentRequests && stats.urgentRequests.length > 0 && (
-                        <div className="bg-red-50 p-3 rounded-md mb-4 text-sm max-h-60 overflow-y-auto">
-                            <ul className="space-y-3">
-                                {stats.urgentRequests.map((req, index) => (
-                                    <li key={index} className="border-b border-red-200 last:border-0 pb-2">
-                                        <div className="flex justify-between items-start">
-                                            <span className="font-bold text-red-800 flex items-center gap-1">
-                                                {req.priority === 'Critical' ? '⚠️' : '🆘'} {req.type}
-                                            </span>
-                                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${req.priority === 'Critical' ? 'bg-red-200 text-red-900' : 'bg-orange-200 text-orange-900'
-                                                }`}>
-                                                {req.priority}
-                                            </span>
-                                        </div>
-                                        <p className="text-gray-800 mt-1 text-xs font-medium">{req.description}</p>
-                                        <div className="flex justify-between items-center mt-1 text-xs text-gray-500">
-                                            <span>📍 {req.location?.city || req.location?.address || 'Location Hidden'}</span>
-                                            <span>{new Date(req.createdAt).toLocaleDateString()}</span>
-                                        </div>
-                                    </li>
-                                ))}
-                            </ul>
+                <div className="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100">
+                    <div className="bg-blue-600 p-5 flex justify-between items-center text-white">
+                        <div className="flex items-center">
+                            <span className="text-2xl mr-3">
+                                {user?.role === 'admin' ? '📋' : '🚨'}
+                            </span>
+                            <h2 className="text-lg font-bold">{title}</h2>
                         </div>
-                    )}
-
-                    <div className="flex flex-col gap-2">
-                        {primaryAction}
                         <button
                             onClick={() => setIsVisible(false)}
-                            className="text-gray-400 hover:underline text-xs text-center"
+                            className="text-blue-100 hover:text-white transition"
                         >
-                            Dismiss
+                            ✕
                         </button>
+                    </div>
+
+                    <div className="p-6">
+                        <p className="text-gray-700 mb-6 text-sm">
+                            {message}
+                        </p>
+
+                        {stats.urgentRequests && stats.urgentRequests.length > 0 && (
+                            <div className="bg-gray-50 p-4 rounded-lg mb-6 text-sm max-h-48 overflow-y-auto border border-gray-100">
+                                <ul className="space-y-4">
+                                    {stats.urgentRequests.map((req, index) => (
+                                        <li key={index} className="border-b border-gray-100 last:border-0 pb-3">
+                                            <div className="flex justify-between items-start">
+                                                <span className="font-bold text-gray-900">
+                                                    ● {req.type}
+                                                </span>
+                                                <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${req.priority === 'Critical' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
+                                                    {req.priority}
+                                                </span>
+                                            </div>
+                                            <p className="text-gray-500 mt-1 text-xs">{req.description}</p>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        <div className="flex flex-col gap-3">
+                            {primaryAction}
+                            <button
+                                onClick={() => setIsVisible(false)}
+                                className="text-gray-500 hover:text-blue-600 font-bold text-xs text-center transition"
+                            >
+                                Dismiss
+                            </button>
+                        </div>
                     </div>
                 </div>
             </motion.div>

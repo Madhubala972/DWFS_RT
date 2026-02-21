@@ -26,7 +26,7 @@ const DeliveryTracker = ({ status }) => {
 
                 {/* Progress Bar Active */}
                 <div
-                    className="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-green-500 -z-10 rounded transition-all duration-500 ease-in-out"
+                    className="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-blue-600 -z-10 rounded-full transition-all duration-700"
                     style={{ width: `${(activeStep / (steps.length - 1)) * 100}%` }}
                 ></div>
 
@@ -37,16 +37,16 @@ const DeliveryTracker = ({ status }) => {
                     return (
                         <div key={index} className="flex flex-col items-center">
                             <div
-                                className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center border-2 transition-colors duration-300
+                                className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all
                                 ${isActive
-                                        ? 'bg-green-500 border-green-500 text-white shadow-sm'
-                                        : 'bg-white border-gray-300 text-gray-400'}`}
+                                        ? 'bg-white border-blue-600 text-blue-600 shadow-md'
+                                        : 'bg-white border-gray-200 text-gray-300'}`}
                             >
-                                {isCompleted ? <FaCheck className="text-[10px] md:text-xs" /> : <span className="text-[10px] md:text-xs">{step.icon}</span>}
+                                {isCompleted ? <FaCheck className="text-sm text-blue-600" /> : <span className="text-sm">{step.icon}</span>}
                             </div>
                             <span
-                                className={`text-[10px] md:text-xs mt-2 font-medium uppercase tracking-wide
-                                ${isActive ? 'text-green-600' : 'text-gray-400'}`}
+                                className={`text-[10px] md:text-xs mt-3 font-bold uppercase tracking-wide
+                                ${isActive ? 'text-blue-700' : 'text-gray-400'}`}
                             >
                                 {step.label}
                             </span>
