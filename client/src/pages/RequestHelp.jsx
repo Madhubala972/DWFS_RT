@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import HelpHeader from '../components/request/HelpHeader';
+import FormFields from '../components/request/FormFields';
+import FormExtra from '../components/request/FormExtra';
 
 const RequestHelp = () => {
     const navigate = useNavigate();
@@ -8,168 +11,43 @@ const RequestHelp = () => {
         type: 'Food',
         description: '',
         quantity: '',
-        address: '',
         city: '',
-        state: '',
-        zip: '',
-        proofOfNeed: '',
-        incomeLevel: '',
-        hasElderly: false,
-        hasDisabled: false,
-        familySize: 1,
-        isFloodZone: false,
-        isDroughtArea: false
+        location: '',
+        pincode: '',
+        vulnerability: { elderly: false, disabled: false },
+        locationRisk: 'Normal'
     });
-
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData({
-            ...formData,
-            [name]: type === 'checkbox' ? checked : value
-        });
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (!user) {
-            alert('Please login first');
-            navigate('/login');
+
+        // Validation
+        if (formData.location.trim().length < 5) {
+            alert('Please provide a valid address');
+            return;
+        }
+        if (!/^\d{6}$/.test(formData.pincode)) {
+            alert('Pincode must be exactly 6 digits');
             return;
         }
 
         try {
-            const config = {
-                headers: { Authorization: `Bearer ${user.token}` },
-            };
-
-            const payload = {
-                type: formData.type,
-                description: formData.description,
-                quantity: formData.quantity,
-                proofOfNeed: formData.proofOfNeed,
-                incomeLevel: Number(formData.incomeLevel),
-                vulnerability: {
-                    hasElderly: formData.hasElderly,
-                    hasDisabled: formData.hasDisabled,
-                    familySize: Number(formData.familySize)
-                },
-                locationRisk: {
-                    isFloodZone: formData.isFloodZone,
-                    isDroughtArea: formData.isDroughtArea
-                },
-                location: {
-                    address: formData.address,
-                    city: formData.city,
-                    state: formData.state,
-                    zip: formData.zip
-                }
-            };
-
-            const res = await axios.post('http://localhost:5000/api/requests', payload, config);
-            alert(`Request submitted successfully!\nPriority: ${res.data.priority}\nScore: ${res.data.priorityScore}`);
+            const user = JSON.parse(localStorage.getItem('user'));
+            const config = { headers: { Authorization: `Bearer ${user.token}` } };
+            await axios.post('http://localhost:5000/api/requests', formData, config);
+            alert('Request submitted successfully!');
             navigate('/dashboard');
-        } catch (error) {
-            alert('Error submitting request');
-        }
+        } catch (err) { alert(err.response?.data?.message || 'Error occurred'); }
     };
 
     return (
-        <div className="bg-gray-50 min-h-screen">
-            {/* Page Header */}
-            <div className="bg-blue-600 text-white py-12 mb-10">
-                <div className="max-w-7xl mx-auto px-4 text-center">
-                    <h1 className="text-3xl font-bold">
-                        Request Aid <span className="text-blue-200">Distribution</span>
-                    </h1>
-                    <p className="text-blue-100 mt-3 max-w-2xl mx-auto">
-                        Fill out the details below. Our system will prioritize your request based on vulnerability and necessity.
-                    </p>
-                </div>
-            </div>
-
-            <div className="max-w-3xl mx-auto px-4 pb-12">
-                <div className="bg-white shadow-lg rounded-xl p-8 md:p-10 border border-gray-100">
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700">Type of Assistance</label>
-                                <select name="type" className="input-field mt-1" value={formData.type} onChange={handleChange}>
-                                    <option>Food</option>
-                                    <option>Funds</option>
-                                    <option>Clothes</option>
-                                    <option>Medical</option>
-                                    <option>Essentials</option>
-                                    <option>Other</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700">Monthly Family Income (INR)</label>
-                                <input name="incomeLevel" type="number" required className="input-field mt-1" placeholder="e.g., 15000" value={formData.incomeLevel} onChange={handleChange} />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-700">Description of Need</label>
-                            <textarea name="description" rows="3" required className="input-field mt-1" placeholder="Describe your situation in detail..." value={formData.description} onChange={handleChange}></textarea>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700">Quantity / Amount Needed</label>
-                                <input name="quantity" type="text" required className="input-field mt-1" placeholder="e.g., 5 food packets, 2000 INR" value={formData.quantity} onChange={handleChange} />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700">Family Size</label>
-                                <input name="familySize" type="number" min="1" required className="input-field mt-1" value={formData.familySize} onChange={handleChange} />
-                            </div>
-                        </div>
-
-                        <div className="bg-gray-50 p-4 rounded-lg flex flex-wrap gap-6 border border-gray-100">
-                            <label className="flex items-center space-x-2 cursor-pointer">
-                                <input type="checkbox" name="hasElderly" checked={formData.hasElderly} onChange={handleChange} className="w-4 h-4 text-blue-600 rounded" />
-                                <span className="text-sm font-medium text-gray-700">Elderly Members (60+)</span>
-                            </label>
-                            <label className="flex items-center space-x-2 cursor-pointer">
-                                <input type="checkbox" name="hasDisabled" checked={formData.hasDisabled} onChange={handleChange} className="w-4 h-4 text-blue-600 rounded" />
-                                <span className="text-sm font-medium text-gray-700">Disabled Members</span>
-                            </label>
-                            <label className="flex items-center space-x-2 cursor-pointer">
-                                <input type="checkbox" name="isFloodZone" checked={formData.isFloodZone} onChange={handleChange} className="w-4 h-4 text-blue-600 rounded" />
-                                <span className="text-sm font-medium text-gray-700">Flood-Prone Area</span>
-                            </label>
-                            <label className="flex items-center space-x-2 cursor-pointer">
-                                <input type="checkbox" name="isDroughtArea" checked={formData.isDroughtArea} onChange={handleChange} className="w-4 h-4 text-blue-600 rounded" />
-                                <span className="text-sm font-medium text-gray-700">Drought-Prone Area</span>
-                            </label>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">City</label>
-                                <input name="city" type="text" required className="input-field mt-1" value={formData.city} onChange={handleChange} />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">State</label>
-                                <input name="state" type="text" required className="input-field mt-1" value={formData.state} onChange={handleChange} />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Address / Location Details</label>
-                            <input name="address" type="text" required className="input-field mt-1" value={formData.address} onChange={handleChange} />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Proof of ID / Need (Image URL) - Optional</label>
-                            <input name="proofOfNeed" type="text" className="input-field mt-1" placeholder="Link to photo or ID" value={formData.proofOfNeed} onChange={handleChange} />
-                        </div>
-
-                        <button type="submit" className="w-full btn-primary">Submit Request</button>
-
-                    </form>
-                </div>
-            </div>
+        <div className="bg-gray-50 min-h-screen pb-20">
+            <HelpHeader />
+            <form onSubmit={handleSubmit} className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg border">
+                <FormFields formData={formData} handleChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })} />
+                <FormExtra formData={formData} setFormData={setFormData} />
+                <button type="submit" className="w-full bg-blue-600 text-white mt-8 py-3 rounded-lg font-bold hover:bg-blue-700 transition">Submit Request</button>
+            </form>
         </div>
     );
 };

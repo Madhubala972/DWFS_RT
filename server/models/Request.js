@@ -20,17 +20,20 @@ const requestSchema = mongoose.Schema(
             type: String,
             required: true,
         },
+        city: {
+            type: String,
+            required: true,
+        },
         location: {
-            address: String,
-            city: String,
-            state: String,
-            zip: String,
-            latitude: Number,
-            longitude: Number,
+            type: String,
+            required: true,
+        },
+        pincode: {
+            type: String,
+            required: true,
         },
         status: {
             type: String,
-            // enum: ['Pending', 'Verified', 'Approved', 'Assigned', 'InProgress', 'Collected', 'Delivered', 'Rejected', 'Cancelled'],
             default: 'Pending',
         },
         priority: {
@@ -44,9 +47,6 @@ const requestSchema = mongoose.Schema(
         },
         priorityExplanation: {
             type: String,
-        },
-        incomeLevel: {
-            type: Number, // Monthly income
         },
         vulnerability: {
             hasElderly: { type: Boolean, default: false },

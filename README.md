@@ -67,15 +67,15 @@ npm run dev
 
 # API Documentation
 
-Detailed API endpoints and request/response examples can be found in [API_DOCUMENTATION.md](./API_DOCUMENTATION.md).
+Detailed API endpoints and request/response examples can be found in [API_DOCUMENTATION.md](./docs/API_DOCUMENTATION.md).
 
 # Database Schema
 
-The entity relationship diagrams and system flow are documented in [ARCHITECTURE.md](./ARCHITECTURE.md#1-entity-relationship-er-diagram).
+The entity relationship diagrams and system flow are documented in [ARCHITECTURE.md](./docs/ARCHITECTURE.md#1-entity-relationship-er-diagram).
 
 # Contributing
 
-Please review our [Contributing Guidelines](./CONTRIBUTING.md) for information on our Git Flow branching strategy and PR process.
+Please review our [Contributing Guidelines](./docs/CONTRIBUTING.md) for information on our Git Flow branching strategy and PR process.
 
 # License
 

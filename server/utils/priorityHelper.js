@@ -26,15 +26,7 @@ const calculatePriority = (requestData, aiPrediction = 'Low') => {
     score += typeScore;
     reasons.push(`Aid Type (${requestData.type}): +${typeScore}`);
 
-    // 3. Vulnerability (Socio-economic)
-    if (requestData.incomeLevel < 10000) {
-        score += 20;
-        reasons.push('Extreme Poverty: +20');
-    } else if (requestData.incomeLevel < 30000) {
-        score += 10;
-        reasons.push('Vulnerable Income: +10');
-    }
-
+    // 3. Vulnerability (Household)
     if (requestData.vulnerability?.hasElderly) {
         score += 10;
         reasons.push('Elderly present: +10');
