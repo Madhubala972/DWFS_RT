@@ -36,7 +36,7 @@ npm start
 
 ### 3. Setup AI Service
 ```bash
-cd ai-service
+cd ai-server
 pip install -r requirements.txt
 python app.py
 ```
@@ -51,7 +51,7 @@ npm run dev
 # Project Structure
 
 ```text
-├── ai-service/          # Python Flask service for priority AI
+├── ai-server/          # Python Flask service for priority AI
 ├── client/              # React frontend application
 ├── server/              # Node.js backend API
 │   ├── config/          # DB connection configuration
