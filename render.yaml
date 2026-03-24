@@ -1,4 +1,5 @@
 services:
+  # 1. Backend Service (Express + Node.js)
   - type: web
     name: welfare-backend
     plan: free
@@ -8,9 +9,22 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 5000
       - key: MONGO_URI
         sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: OPENAI_API_KEY
         sync: false
+
+  # 2. Frontend Service (Vite React - Static Site)
+  - type: static
+    name: welfare-frontend
+    plan: free
+    env: static
+    buildCommand: "cd client && npm install && npm run build"
+    publishPath: "client/dist"
+    envVars:
+      - key: VITE_API_URL
+        sync: false # User must set this to the backend URL on Render dash
