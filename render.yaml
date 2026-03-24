@@ -1,0 +1,32 @@
+services:
+  # Main Full-stack Web Service (API + React Client)
+  - type: web
+    name: dwfs-platform-backend
+    env: node
+    plan: free
+    buildCommand: "npm install && npm run build --prefix client && npm install --prefix server"
+    startCommand: "cd server && npm run start:prod"
+    envVars:
+      - key: MONGO_URI
+        sync: false # Set in Render Dashboard
+      - key: JWT_SECRET
+        sync: false # Set in Render Dashboard
+      - key: NODE_ENV
+        value: production
+      - key: AI_SERVICE_URL
+        fromService:
+          type: web
+          name: dwfs-ai-service
+          property: host
+        path: /predict # Assuming we append /predict in the code or here
+
+  # AI Microservice (Python)
+  - type: web
+    name: dwfs-ai-service
+    env: python
+    plan: free
+    buildCommand: "cd ai-server && pip install -r requirements.txt"
+    startCommand: "cd ai-server && gunicorn app:app"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
