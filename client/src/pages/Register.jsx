@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 import RegisterFields from '../components/auth/RegisterFields';
 import LocationFields from '../components/auth/LocationFields';
 
@@ -27,7 +27,7 @@ const Register = () => {
 
         try {
             const loc = { address: formData.address, city: formData.city, state: formData.state, zip: formData.zip };
-            const { data } = await axios.post('http://localhost:5000/api/auth/register', { ...formData, location: loc });
+            const { data } = await api.post('/auth/register', { ...formData, location: loc });
             localStorage.setItem('user', JSON.stringify(data)); navigate('/dashboard');
         } catch (err) { alert(err.response?.data?.message || 'Registration failed'); }
     };

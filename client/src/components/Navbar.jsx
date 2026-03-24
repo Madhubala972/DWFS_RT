@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import DesktopMenu from './navbar/DesktopMenu';
 import MobileMenu from './navbar/MobileMenu';
 
@@ -11,9 +11,7 @@ const Navbar = () => {
 
     const handleLogout = async () => {
         try {
-            if (user?.token) {
-                await axios.post('http://localhost:5000/api/auth/logout', {}, { headers: { Authorization: `Bearer ${user.token}` } });
-            }
+                await api.post('/auth/logout', {});
         } catch (e) { console.error(e); }
         localStorage.removeItem('user'); navigate('/login');
     };

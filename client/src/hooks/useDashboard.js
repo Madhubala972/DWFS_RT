@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 
 export const useDashboard = () => {
@@ -9,9 +9,8 @@ export const useDashboard = () => {
 
     const fetchRequests = useCallback(async (currUser) => {
         try {
-            const config = { headers: { Authorization: `Bearer ${currUser.token}` } };
-            const url = ['admin', 'ngo', 'volunteer'].includes(currUser.role) ? 'http://localhost:5000/api/requests' : 'http://localhost:5000/api/requests/my';
-            const { data } = await axios.get(url, config);
+            const url = ['admin', 'ngo', 'volunteer'].includes(currUser.role) ? '/requests' : '/requests/my';
+            const { data } = await api.get(url);
             setRequests(data);
         } catch (e) {
             if (e.response?.status === 401) { localStorage.removeItem('user'); navigate('/login'); }
@@ -20,10 +19,9 @@ export const useDashboard = () => {
 
     const updateStatus = async (id, status, extraData = {}) => {
         try {
-            const config = { headers: { Authorization: `Bearer ${user.token}` } };
             const payload = { status, ...extraData };
             if (status === 'Assigned' && user.role === 'volunteer') payload.assignedTo = user._id;
-            await axios.put(`http://localhost:5000/api/requests/${id}`, payload, config);
+            await api.put(`/requests/${id}`, payload);
             alert(`Request updated to ${status}`);
             fetchRequests(user);
         } catch (error) {

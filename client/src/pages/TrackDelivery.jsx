@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import { useSearchParams, Link } from 'react-router-dom';
 import TrackHeader from '../components/track/TrackHeader';
 import TrackInput from '../components/track/TrackInput';
@@ -18,7 +18,7 @@ const TrackDelivery = () => {
         if (!id) return;
         setLoading(true); setRequest(null);
         try {
-            const { data } = await axios.get(`http://localhost:5000/api/requests/track/${id}`);
+            const { data } = await api.get(`/requests/track/${id}`);
             setRequest(data);
         } catch (e) { alert('No request found with this ID'); }
         finally { setLoading(false); }
@@ -30,8 +30,7 @@ const TrackDelivery = () => {
         if (user) {
             const fetchMyRequests = async () => {
                 try {
-                    const config = { headers: { Authorization: `Bearer ${user.token}` } };
-                    const { data } = await axios.get('http://localhost:5000/api/requests/my', config);
+                    const { data } = await api.get('/requests/my');
                     setUserRequests(data);
                 } catch (e) { console.error('Error fetching user requests:', e); }
             };

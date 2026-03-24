@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 import SummaryCards from '../components/analytics/SummaryCards';
 
@@ -17,8 +17,7 @@ const Analytics = () => {
             const user = JSON.parse(localStorage.getItem('user'));
             if (!user || user.role !== 'admin') { navigate(user ? '/' : '/login'); return; }
             try {
-                const config = { headers: { Authorization: `Bearer ${user.token}` } };
-                const { data } = await axios.get(`http://localhost:5000/api/requests/stats?timeframe=${timeframe}`, config);
+                const { data } = await api.get(`/requests/stats?timeframe=${timeframe}`);
                 setStats(data);
             } catch (e) { if (e.response?.status === 401) navigate('/login'); }
         };

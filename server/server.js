@@ -20,16 +20,25 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan('dev'));
 
-// Routes
-app.get('/', (req, res) => {
-  res.send('Disaster Welfare Platform API is running...');
-});
-
+const path = require('path');
 // Define Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/requests', require('./routes/requestRoutes'));
 app.use('/api/logs', require('./routes/logRoutes'));
-// app.use('/api/admin', require('./routes/adminRoutes'));
+
+// Serve Static Assets in production
+if (process.env.NODE_ENV === 'production') {
+  const clientBuildPath = path.join(__dirname, '../client/dist');
+  app.use(express.static(clientBuildPath));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(clientBuildPath, 'index.html'));
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.send('API is running...');
+  });
+}
 
 app.use(notFound);
 app.use(errorHandler);

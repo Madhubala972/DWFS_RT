@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 import HelpHeader from '../components/request/HelpHeader';
 import FormFields from '../components/request/FormFields';
@@ -40,14 +40,7 @@ const RequestHelp = () => {
         }
 
         try {
-            const user = JSON.parse(localStorage.getItem('user'));
-            if (!user?.token) {
-                alert('Session expired. Please login again.');
-                navigate('/login');
-                return;
-            }
-            const config = { headers: { Authorization: `Bearer ${user.token}` } };
-            await axios.post('http://localhost:5000/api/requests', formData, config);
+            await api.post('/requests', formData);
             alert('Request submitted successfully!');
             navigate('/dashboard');
         } catch (err) { 
