@@ -1,6 +1,7 @@
 services:
   - type: web
     name: welfare-backend
+    plan: free
     env: node
     buildCommand: "cd server && npm install"
     startCommand: "cd server && npm run start:prod"
