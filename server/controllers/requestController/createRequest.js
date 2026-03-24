@@ -6,7 +6,8 @@ const { calculatePriority } = require('../../utils/priorityHelper');
 
 const getAiPriority = async (description) => {
     try {
-        const response = await axios.post('http://localhost:5001/predict', { description });
+        const url = process.env.AI_SERVICE_URL || 'http://localhost:5001/predict';
+        const response = await axios.post(url, { description });
         return response.data.priority || 'Low';
     } catch (err) {
         return 'Low';

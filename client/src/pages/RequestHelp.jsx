@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import HelpHeader from '../components/request/HelpHeader';
@@ -18,6 +18,14 @@ const RequestHelp = () => {
         locationRisk: 'Normal'
     });
 
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || !user.token) {
+            alert('Please login to request assistance');
+            navigate('/login');
+        }
+    }, [navigate]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -33,11 +41,24 @@ const RequestHelp = () => {
 
         try {
             const user = JSON.parse(localStorage.getItem('user'));
+            if (!user?.token) {
+                alert('Session expired. Please login again.');
+                navigate('/login');
+                return;
+            }
             const config = { headers: { Authorization: `Bearer ${user.token}` } };
             await axios.post('http://localhost:5000/api/requests', formData, config);
             alert('Request submitted successfully!');
             navigate('/dashboard');
-        } catch (err) { alert(err.response?.data?.message || 'Error occurred'); }
+        } catch (err) { 
+            if (err.response?.status === 401) {
+                alert('Session expired or invalid. Please login again.');
+                localStorage.removeItem('user');
+                navigate('/login');
+            } else {
+                alert(err.response?.data?.message || 'Error occurred'); 
+            }
+        }
     };
 
     return (

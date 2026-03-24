@@ -1,43 +1,34 @@
-import random
 import os
-import joblib
+from transformers import pipeline
 
-# Load the trained ML model if it exists
-model_path = os.path.join(os.path.dirname(__file__), 'disaster_model.pkl')
-ml_model = None
-if os.path.exists(model_path):
-    try:
-        ml_model = joblib.load(model_path)
-        print("ML model loaded successfully.")
-    except Exception as e:
-        print(f"Error loading ML model: {e}")
+print("Loading Zero-Shot Classifier Model... (This takes a moment on startup)")
+# Using the DistilBART version as it is much faster and lighter than the large BART
+classifier = pipeline("zero-shot-classification", model="valhalla/distilbart-mnli-12-3")
 
 def predict_priority(text):
     """
-    Predicts priority based on an ML model with keyword fallback.
+    Predicts priority using a pre-trained zero-shot NLP model.
     """
-    if ml_model:
-        try:
-            return ml_model.predict([text])[0]
-        except:
-            pass
-            
-    # Fallback keyword logic
-    text = text.lower()
-    critical_keywords = ['urgent', 'emergency', 'life-threatening', 'medical', 'blood', 'rescue', 'trapped', 'flood', 'collapsed']
-    high_keywords = ['food', 'starving', 'water', 'shelter', 'starvation', 'drinking']
-    medium_keywords = ['clothes', 'blankets', 'medicines', 'funds', 'first aid', 'repair']
+    # Use descriptive labels to help the model understand the nuances
+    label_map = {
+        "Immediate Life-Threatening rescue or medical emergency": "Critical",
+        "Urgent requirement for food or shelter": "High",
+        "Need for clothing, blankets or basic supplies": "Medium",
+        "General inquiry or low priority information": "Low"
+    }
+    descriptive_labels = list(label_map.keys())
     
-    for word in critical_keywords:
-        if word in text:
-            return 'Critical'
-            
-    for word in high_keywords:
-        if word in text:
-            return 'High'
-            
-    for word in medium_keywords:
-        if word in text:
-            return 'Medium'
-            
-    return 'Low'
+    try:
+        # The AI dynamically scores the text against the 4 labels
+        result = classifier(text, candidate_labels=descriptive_labels)
+        
+        # Get the top descriptive label and map it back to the original priority levels
+        best_match = result['labels'][0]
+        predicted_label = label_map[best_match]
+        
+        return predicted_label
+        
+    except Exception as e:
+        print(f"AI Prediction Error: {e}")
+        # Absolute worst-case fallback
+        return 'Low'
