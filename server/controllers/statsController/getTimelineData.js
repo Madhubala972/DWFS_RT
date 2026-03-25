@@ -2,17 +2,18 @@ const Request = require('../../models/Request');
 const { getTimelineDates } = require('../../utils/statsHelper');
 
 const getTimelineData = async (startDate, formatString, stepCount, stepType) => {
-    const requestTimeline = await Request.aggregate([
-        { $match: { createdAt: { $gte: startDate } } },
-        { $group: { _id: { date: { $dateToString: { format: formatString, date: "$createdAt" } }, type: "$type" }, count: { $sum: 1 } } },
-        { $sort: { "_id.date": 1 } }
-    ]);
-
-    const deliveryTimeline = await Request.aggregate([
-        { $match: { status: 'Delivered' } },
-        { $addFields: { effectiveDate: { $ifNull: ["$deliveredAt", "$updatedAt"] } } },
-        { $match: { effectiveDate: { $gte: startDate } } },
-        { $group: { _id: { $dateToString: { format: formatString, date: "$effectiveDate" } }, count: { $sum: 1 } } }
+    const [requestTimeline, deliveryTimeline] = await Promise.all([
+        Request.aggregate([
+            { $match: { createdAt: { $gte: startDate } } },
+            { $group: { _id: { date: { $dateToString: { format: formatString, date: "$createdAt" } }, type: "$type" }, count: { $sum: 1 } } },
+            { $sort: { "_id.date": 1 } }
+        ]),
+        Request.aggregate([
+            { $match: { status: 'Delivered' } },
+            { $addFields: { effectiveDate: { $ifNull: ["$deliveredAt", "$updatedAt"] } } },
+            { $match: { effectiveDate: { $gte: startDate } } },
+            { $group: { _id: { $dateToString: { format: formatString, date: "$effectiveDate" } }, count: { $sum: 1 } } }
+        ])
     ]);
 
     const dates = getTimelineDates(new Date(), stepCount, stepType);
