@@ -19,7 +19,7 @@ const registerUser = async (req, res) => {
 
         const user = await User.create({ name, email, password, role, phone, location });
         if (user) {
-            await logActivity(user._id, 'REGISTER', 'User registered', user._id, 'User', req.ip);
+            logActivity(user._id, 'REGISTER', 'User registered', user._id, 'User', req.ip);
             res.status(201).json({ _id: user._id, name: user.name, email: user.email, role: user.role, token: generateToken(user._id, user.role) });
         } else res.status(400).json({ message: 'Invalid user data' });
     } catch (error) {
