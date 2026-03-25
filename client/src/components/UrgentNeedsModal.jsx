@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../api/axios';
+import api from '../services/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import ModalHeader from './modal/ModalHeader';
@@ -16,7 +16,7 @@ const UrgentNeedsModal = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const { data } = await api.get('/requests/stats');
+                const { data } = await api.get('/api/requests/stats');
                 if (data.byStatus?.Pending > 0) {
                     setStats(data);
                     setTimeout(() => setIsVisible(true), 1500);

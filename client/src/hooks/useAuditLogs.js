@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../api/axios';
+import api from '../services/api';
 import { AUDIT_MOCK_DATA } from '../constants/mockData';
 
 export const useAuditLogs = () => {
@@ -9,7 +9,7 @@ export const useAuditLogs = () => {
     useEffect(() => {
         const fetchLogs = async () => {
             try {
-                const { data } = await api.get('/logs');
+                const { data } = await api.get('/api/logs');
                 setLogs([...data, ...AUDIT_MOCK_DATA]);
             } catch (error) {
                 console.error('Error fetching logs:', error);

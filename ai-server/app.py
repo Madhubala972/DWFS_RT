@@ -20,5 +20,10 @@ def predict():
     priority = model.predict_priority(description)
     return jsonify({'priority': priority})
 
+import os
+
 if __name__ == '__main__':
-    app.run(port=5001, debug=True)
+    # Use environment PORT or default to 5001 (standard for Flask in dev)
+    # Hugging Face Spaces usually requires port 7860
+    port = int(os.environ.get("PORT", 5001))
+    app.run(host='0.0.0.0', port=port)

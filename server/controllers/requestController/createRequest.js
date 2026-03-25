@@ -1,36 +1,16 @@
 const Request = require('../../models/Request');
 const asyncHandler = require('express-async-handler');
-const OpenAI = require('openai');
+const axios = require('axios');
 const logActivity = require('../../utils/logger');
 const { calculatePriority } = require('../../utils/priorityHelper');
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
-
 const getAiPriority = async (description) => {
     try {
-        if (!process.env.OPENAI_API_KEY) return 'Low';
-
-        const response = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages: [
-                {
-                    role: "system",
-                    content: "You are a crisis triage expert. Based on the disaster relief request description, assign a priority: 'Low', 'Medium', 'High', or 'Critical'. Response should be exactly one word."
-                },
-                {
-                    role: "user",
-                    content: description
-                }
-            ],
-            max_tokens: 5,
-        });
-
-        const priority = response.choices[0].message.content.trim();
-        return ['Low', 'Medium', 'High', 'Critical'].includes(priority) ? priority : 'Low';
+        const baseUrl = process.env.AI_SERVICE_URL || 'http://localhost:5001';
+        const url = `${baseUrl.replace(/\/$/, '')}/predict`;
+        const response = await axios.post(url, { description });
+        return response.data.priority || 'Low';
     } catch (err) {
-        console.error('OpenAI Error:', err);
         return 'Low';
     }
 };

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import api from '../api/axios';
+import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
 export const useDashboard = () => {
@@ -9,7 +9,7 @@ export const useDashboard = () => {
 
     const fetchRequests = useCallback(async (currUser) => {
         try {
-            const url = ['admin', 'ngo', 'volunteer'].includes(currUser.role) ? '/requests' : '/requests/my';
+            const url = ['admin', 'ngo', 'volunteer'].includes(currUser.role) ? '/api/requests' : '/api/requests/my';
             const { data } = await api.get(url);
             setRequests(data);
         } catch (e) {
@@ -21,10 +21,11 @@ export const useDashboard = () => {
         try {
             const payload = { status, ...extraData };
             if (status === 'Assigned' && user.role === 'volunteer') payload.assignedTo = user._id;
-            await api.put(`/requests/${id}`, payload);
+            await api.put(`/api/requests/${id}`, payload);
             alert(`Request updated to ${status}`);
             fetchRequests(user);
         } catch (error) {
+// ...
             alert(`Error: ${error.response?.data?.message || error.message}`);
         }
     };

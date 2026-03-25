@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../api/axios';
+import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import HelpHeader from '../components/request/HelpHeader';
 import FormFields from '../components/request/FormFields';
@@ -40,7 +40,7 @@ const RequestHelp = () => {
         }
 
         try {
-            await api.post('/requests', formData);
+            await api.post('/api/requests', formData);
             alert('Request submitted successfully!');
             navigate('/dashboard');
         } catch (err) { 

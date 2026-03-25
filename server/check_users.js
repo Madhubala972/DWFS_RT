@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
-require('dotenv').config();
-const User = require('./models/User');
+require('dotenv').config({ path: './server/.env' });
+const User = require('./server/models/User');
 
 const checkUsers = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI);
+        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/disaster_welfare');
         const users = await User.find({});
         console.log('Total Users:', users.length);
         users.forEach(u => console.log(`Email: ${u.email}, Role: ${u.role}`));

@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import api from '../api/axios';
+import api from '../services/api';
 import DesktopMenu from './navbar/DesktopMenu';
 import MobileMenu from './navbar/MobileMenu';
 
@@ -11,7 +11,9 @@ const Navbar = () => {
 
     const handleLogout = async () => {
         try {
-                await api.post('/auth/logout', {});
+            if (user?.token) {
+                await api.post('/api/auth/logout', {});
+            }
         } catch (e) { console.error(e); }
         localStorage.removeItem('user'); navigate('/login');
     };
