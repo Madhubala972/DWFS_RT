@@ -1,9 +1,11 @@
 const Request = require('../../models/Request');
 const asyncHandler = require('express-async-handler');
 
-// Get requests created by the logged in user
+// Get recent requests created by the logged-in user
 const getMyRequests = asyncHandler(async (req, res) => {
-    const requests = await Request.find({ user: req.user._id });
+    const requests = await Request.find({ user: req.user._id })
+        .sort({ createdAt: -1 })
+        .limit(50);
     res.json(requests);
 });
 

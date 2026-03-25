@@ -5,9 +5,11 @@ const asyncHandler = require('express-async-handler');
 // @route   GET /api/logs
 // @access  Private (Admin)
 const getLogs = asyncHandler(async (req, res) => {
+    // Limited to 200 logs for better dashboard performance
     const logs = await ActivityLog.find({})
         .populate('user', 'name email role')
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
+        .limit(200);
     res.json(logs);
 });
 

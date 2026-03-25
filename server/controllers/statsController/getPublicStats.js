@@ -21,12 +21,22 @@ const getTimeParams = async (timeframe) => {
 
 const getPublicStats = asyncHandler(async (req, res) => {
     const { startDate, format, steps, type } = await getTimeParams(req.query.timeframe);
-    const dist = await getDistribution();
-    const timeline = await getTimelineData(startDate, format, steps, type);
-    const perf = await getPerformanceStats();
-    const extra = await getUrgentAndWeekly(new Date());
+    
+    // Run multiple aggregation queries in parallel for better performance
+    const [dist, timeline, perf, extra] = await Promise.all([
+        getDistribution(),
+        getTimelineData(startDate, format, steps, type),
+        getPerformanceStats(),
+        getUrgentAndWeekly(new Date())
+    ]);
 
-    res.json({ ...dist, timeline, fulfillmentStats: perf.fulfillment, completionEfficiency: perf.efficiency, ...extra });
+    res.json({ 
+        ...dist, 
+        timeline, 
+        fulfillmentStats: perf.fulfillment, 
+        completionEfficiency: perf.efficiency, 
+        ...extra 
+    });
 });
 
 module.exports = getPublicStats;

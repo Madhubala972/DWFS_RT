@@ -33,19 +33,38 @@ const createRequest = asyncHandler(async (req, res) => {
         throw new Error('Pincode must be exactly 6 digits');
     }
 
-    const aiPrediction = await getAiPriority(description);
-    const { score, priority, explanation } = calculatePriority({
+    // 1. Initial Priority (Before AI)
+    const { score: initScore, priority: initPrio, explanation: initExpl } = calculatePriority({
         type, vulnerability, locationRisk
-    }, aiPrediction);
+    }, 'Pending');
 
     const request = await Request.create({
         user: req.user._id, type, description, quantity, city, location, pincode,
         vulnerability, locationRisk,
-        status: 'Pending', priority, priorityScore: score, priorityExplanation: explanation
+        status: 'Pending', priority: initPrio, priorityScore: initScore, priorityExplanation: initExpl
     });
 
-    await logActivity(req.user._id, 'CREATE_REQUEST', `New request: ${type}`, request._id, 'Request', req.ip);
+    // 2. Return immediate response
     res.status(201).json(request);
+
+    // 3. Background AI Update
+    (async () => {
+        try {
+            const aiPrediction = await getAiPriority(description);
+            const { score, priority, explanation } = calculatePriority({
+                type, vulnerability, locationRisk
+            }, aiPrediction);
+            
+            await Request.findByIdAndUpdate(request._id, {
+                priority, priorityScore: score, priorityExplanation: explanation
+            });
+            console.log(`Background AI update complete for request ${request._id}`);
+        } catch (err) {
+            console.error('Background AI update failed:', err);
+        }
+    })();
+
+    await logActivity(req.user._id, 'CREATE_REQUEST', `New request: ${type}`, request._id, 'Request', req.ip);
 });
 
 module.exports = createRequest;

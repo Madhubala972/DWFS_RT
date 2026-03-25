@@ -13,7 +13,10 @@ const Login = () => {
         try {
             const { data } = await api.post('/api/auth/login', { email, password });
             localStorage.setItem('user', JSON.stringify(data));
-// ...
+            
+            // Warm up the AI server in the background so it's ready when they submit a request
+            api.get('/api/requests/warmup').catch(() => {}); 
+            
             navigate('/dashboard');
         } catch (err) { alert(err.response?.data?.message || 'Login failed'); }
     };

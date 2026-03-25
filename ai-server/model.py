@@ -1,14 +1,19 @@
-import os
+from functools import lru_cache
 from transformers import pipeline
 
-print("Loading Zero-Shot Classifier Model... (This takes a moment on startup)")
-# Using the DistilBART version as it is much faster and lighter than the large BART
-classifier = pipeline("zero-shot-classification", model="valhalla/distilbart-mnli-12-3")
+print("Loading Fast NLP Model... (Optimized for speed)")
+# MiniLM is significantly faster than DistilBART on CPU while maintaining good accuracy for zero-shot tasks
+classifier = pipeline("zero-shot-classification", model="cross-encoder/nli-MiniLM-L6-v2")
 
+@lru_cache(maxsize=128)
 def predict_priority(text):
     """
     Predicts priority using a pre-trained zero-shot NLP model.
+    Cached for faster repeated queries.
     """
+    if not text or len(text.strip()) < 5:
+        return "Low"
+
     # Use descriptive labels to help the model understand the nuances
     label_map = {
         "Immediate Life-Threatening rescue or medical emergency": "Critical",

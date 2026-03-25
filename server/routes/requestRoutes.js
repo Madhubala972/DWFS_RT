@@ -5,7 +5,8 @@ const {
     getRequests,
     getMyRequests,
     updateRequest,
-    getRequestById
+    getRequestById,
+    warmupAi
 } = require('../controllers/requestController');
 const {
     getPublicStats,
@@ -15,6 +16,7 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 
 router.get('/stats', getPublicStats);
 router.get('/track/:id', getPublicRequestStatus);
+router.get('/warmup', protect, warmupAi);
 
 router.route('/')
     .post(protect, createRequest)
