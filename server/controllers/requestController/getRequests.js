@@ -5,8 +5,9 @@ const asyncHandler = require('express-async-handler');
 const getRequests = asyncHandler(async (req, res) => {
     const requests = await Request.find({})
         .populate('user', 'name email phone')
-        .sort({ createdAt: -1 }) // Use the index to get recent requests first
-        .limit(100); // Prevent loading thousands of records at once
+        .sort({ createdAt: -1 })
+        .limit(100)
+        .lean(); // Faster query, raw JSON
     res.json(requests);
 });
 

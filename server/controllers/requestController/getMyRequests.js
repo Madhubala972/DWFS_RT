@@ -5,7 +5,8 @@ const asyncHandler = require('express-async-handler');
 const getMyRequests = asyncHandler(async (req, res) => {
     const requests = await Request.find({ user: req.user._id })
         .sort({ createdAt: -1 })
-        .limit(50);
+        .limit(50)
+        .lean();
     res.json(requests);
 });
 

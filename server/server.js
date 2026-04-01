@@ -2,7 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const helmet = require('helmet');
-const morgan = require('morgan');
+const compression = require('compression');
 const connectDB = require('./config/db');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
@@ -18,6 +18,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
+app.use(compression()); // Compress responses for better performance
 app.use(morgan('dev'));
 
 // Routes
