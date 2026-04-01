@@ -91,6 +91,7 @@ requestSchema.index({ priority: 1 });
 requestSchema.index({ user: 1 });
 requestSchema.index({ assignedTo: 1 });
 requestSchema.index({ createdAt: -1 }); // Optimize timeline & recent queries
+requestSchema.index({ deliveredAt: -1 }); // Optimize delivery stats
 
 const Request = mongoose.model('Request', requestSchema);
 

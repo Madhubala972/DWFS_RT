@@ -60,7 +60,10 @@ npm run dev
 │   ├── models/          # Mongoose schemas
 │   ├── routes/          # Express route definitions
 │   └── utils/           # Utility functions
-├── ARCHITECTURE.md      # System design and Mermaid diagrams
+├── design/              # UI/UX and system architecture visuals
+│   └── diagrams/        # Detailed architecture and flow charts
+├── docs/                # Project documentation and survey reports
+├── ARCHITECTURE.md      # Core system design and ER diagrams
 ├── CONTRIBUTING.md      # Git Flow and PR guidelines
 └── API_DOCUMENTATION.md # Backend API details
 ```
@@ -76,6 +79,12 @@ The entity relationship diagrams and system flow are documented in [ARCHITECTURE
 # Contributing
 
 Please review our [Contributing Guidelines](./docs/CONTRIBUTING.md) for information on our Git Flow branching strategy and PR process.
+
+# Performance & Trends
+The platform has been optimized for high-volume data processing:
+- **O(1) Aggregations**: Refactored timeline processing for sub-second dashboard loads.
+- **Timezone Sync**: Integrated India Standard Time (+05:30) for accurate trend reporting.
+- **Join Optimization**: Highly efficient role-based fulfillment analytics.
 
 # License
 

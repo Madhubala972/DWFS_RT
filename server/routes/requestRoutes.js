@@ -10,11 +10,13 @@ const {
 } = require('../controllers/requestController');
 const {
     getPublicStats,
-    getPublicRequestStatus
+    getPublicRequestStatus,
+    getSummary
 } = require('../controllers/statsController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 router.get('/stats', getPublicStats);
+router.get('/summary', getSummary);
 router.get('/track/:id', getPublicRequestStatus);
 router.get('/warmup', protect, warmupAi);
 

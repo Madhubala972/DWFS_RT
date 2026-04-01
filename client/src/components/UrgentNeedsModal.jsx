@@ -16,7 +16,7 @@ const UrgentNeedsModal = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const { data } = await api.get('/api/requests/stats');
+                const { data } = await api.get('/api/requests/summary');
                 if (data.byStatus?.Pending > 0) {
                     setStats(data);
                     setTimeout(() => setIsVisible(true), 1500);

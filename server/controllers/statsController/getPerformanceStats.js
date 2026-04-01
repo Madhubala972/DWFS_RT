@@ -5,9 +5,10 @@ const getPerformanceStats = async () => {
     const [roleStats, efficiencyData] = await Promise.all([
         Request.aggregate([
             { $match: { status: { $in: ['Assigned', 'Delivered'] } } },
-            { $lookup: { from: 'users', localField: 'assignedTo', foreignField: '_id', as: 'user' } },
-            { $project: { status: 1, role: { $ifNull: [{ $arrayElemAt: ["$user.role", 0] }, "admin"] } } },
-            { $group: { _id: { status: "$status", role: "$role" }, count: { $sum: 1 } } }
+            { $group: { _id: { user: "$assignedTo", status: "$status" }, count: { $sum: 1 } } },
+            { $lookup: { from: 'users', localField: '_id.user', foreignField: '_id', as: 'user' } },
+            { $project: { status: "$_id.status", role: { $ifNull: [{ $arrayElemAt: ["$user.role", 0] }, "admin"] }, count: 1 } },
+            { $group: { _id: { status: "$status", role: "$role" }, count: { $sum: "$count" } } }
         ]),
         Request.aggregate([
             { $match: { status: 'Delivered', createdAt: { $exists: true } } },
