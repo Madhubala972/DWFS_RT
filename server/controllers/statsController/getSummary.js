@@ -5,8 +5,11 @@ const asyncHandler = require('express-async-handler');
 const getSummaryAction = asyncHandler(async (req, res) => {
     const [statusCounts, urgentRequests] = await Promise.all([
         Request.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
-        Request.find({ status: 'Pending', priority: { $in: ['Critical', 'High'] } })
-            .sort({ createdAt: -1 }).limit(3).select('type priority location')
+        Request.find({ status: 'Pending' }) // Show all pending to be safe, filter in UI if needed
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .select('type priority location description city createdAt')
+            .lean()
     ]);
 
     const byStatus = {};

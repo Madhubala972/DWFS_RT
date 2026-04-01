@@ -64,6 +64,9 @@ const createRequest = asyncHandler(async (req, res) => {
         }
     })();
 
+    const { clearStatsCache } = require('../statsController');
+    clearStatsCache(); // Ensure dashboard reflects new data instantly
+
     await logActivity(req.user._id, 'CREATE_REQUEST', `New request: ${type}`, request._id, 'Request', req.ip);
 });
 

@@ -64,4 +64,9 @@ const getPublicStats = asyncHandler(async (req, res) => {
     res.json(result);
 });
 
-module.exports = getPublicStats;
+const clearStatsCache = () => {
+    console.log('Invalidating statistics cache due to data change...');
+    statsCache.clear();
+};
+
+module.exports = { getPublicStats, clearStatsCache };

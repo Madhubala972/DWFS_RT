@@ -19,17 +19,21 @@ const UrgentNeedsModal = () => {
                 const { data } = await api.get('/api/requests/summary');
                 if (data.byStatus?.Pending > 0) {
                     setStats(data);
-                    setTimeout(() => setIsVisible(true), 1500);
+                    setIsVisible(true);
+                } else {
+                    setIsVisible(false);
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error('Stats fetch error:', e);
+            }
         };
         fetchStats();
+        const interval = setInterval(fetchStats, 30000); // Poll every 30s for real-time feel
+        return () => clearInterval(interval);
     }, [user?.role]);
 
-    if (!isVisible || !stats) return null;
-
     const role = user?.role || 'guest';
-    const pending = stats.byStatus?.Pending || 0;
+    const pending = stats?.byStatus?.Pending || 0;
     const title = role === 'admin' ? 'Action Required' : (role === 'volunteer' ? 'New Tasks Available' : 'Urgent Help Needed!');
     const msg = role === 'admin' ? `Review ${pending} pending requests.` : `Join to help ${pending} people in need.`;
 
@@ -40,19 +44,26 @@ const UrgentNeedsModal = () => {
 
     return (
         <AnimatePresence>
-            <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 50, opacity: 0 }} className="fixed bottom-5 right-5 z-50 max-w-sm w-full">
-                <div className="bg-white rounded-xl shadow-2xl overflow-hidden border">
-                    <ModalHeader title={title} role={role} onClose={() => setIsVisible(false)} />
-                    <div className="p-6">
-                        <p className="text-gray-700 mb-6 text-sm italic">{msg}</p>
-                        <ModalList requests={stats.urgentRequests} />
-                        <div className="flex flex-col gap-3">
-                            <ModalActions role={role} onNavigate={handleNav} onClose={() => setIsVisible(false)} />
-                            <button onClick={() => setIsVisible(false)} className="text-gray-400 text-[10px] font-bold uppercase">Dismiss</button>
+            {isVisible && stats && (
+                <motion.div 
+                    initial={{ y: 50, opacity: 0, scale: 0.95 }} 
+                    animate={{ y: 0, opacity: 1, scale: 1 }} 
+                    exit={{ y: 50, opacity: 0, scale: 0.95 }} 
+                    className="fixed bottom-5 right-5 z-50 max-w-sm w-full"
+                >
+                    <div className="bg-white rounded-xl shadow-2xl overflow-hidden border">
+                        <ModalHeader title={title} role={role} onClose={() => setIsVisible(false)} />
+                        <div className="p-6">
+                            <p className="text-gray-700 mb-6 text-sm italic">{msg}</p>
+                            <ModalList requests={stats.urgentRequests} />
+                            <div className="flex flex-col gap-3">
+                                <ModalActions role={role} onNavigate={handleNav} onClose={() => setIsVisible(false)} />
+                                <button onClick={() => setIsVisible(false)} className="text-gray-400 text-[10px] font-bold uppercase transition hover:text-gray-600">Dismiss</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </motion.div>
+                </motion.div>
+            )}
         </AnimatePresence>
     );
 };

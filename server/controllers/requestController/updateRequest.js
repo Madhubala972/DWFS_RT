@@ -24,6 +24,10 @@ const updateRequest = asyncHandler(async (req, res) => {
     if (req.body.status === 'Delivered' && !request.deliveredAt) request.deliveredAt = new Date();
 
     const updatedRequest = await request.save();
+
+    const { clearStatsCache } = require('../statsController');
+    clearStatsCache(); // Invalidate cache on update
+
     res.json(updatedRequest);
 });
 
