@@ -1,72 +1,91 @@
-import os
-import google.generativeai as genai
-from dotenv import load_dotenv
+import re
 from functools import lru_cache
+from transformers import pipeline
 
-# Load environment variables
-load_dotenv()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-
-# Configure Gemini
-if GEMINI_API_KEY:
-    try:
-        genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel('gemini-flash-latest')
-        HAS_GEMINI = True
-        print("Google Gemini AI Integrated Successfully!")
-    except Exception as e:
-        print(f"Gemini Config Error: {e}")
-        HAS_GEMINI = False
-else:
-    HAS_GEMINI = False
-    print("Warning: GEMINI_API_KEY not found. Falling back to keyword analysis.")
+print("Loading Fast NLP Model... (Optimized for speed)")
+try:
+    # Use a well-known model name
+    classifier = pipeline("zero-shot-classification", model="valhalla/distilbart-mnli-12-3")
+    HAS_MODEL = True
+except Exception as e:
+    print(f"Failed to load NLP model: {e}. Falling back to Keyword Analysis.")
+    HAS_MODEL = False
 
 def keyword_analysis(text):
     text = text.lower()
-    # Fast manual checks for survival risks (Fallback)
-    if any(word in text for word in ['starvation', 'unconscious', 'bleeding', 'eviction', 'homeless', 'critical', 'dying']):
+    
+    # --- CRITICAL (Immediate Life/Death/Total Loss/Medical Emergency) ---
+    if any(word in text for word in [
+        'starvation', 'eaten for days', 'not eaten', 'bleeding', 'unconscious', 
+        'eviction', 'evicted', 'homeless', 'no safety', 'disaster victim', 
+        'immediate emergency', 'medical emergency', 'dying', 'cannot breathe', 
+        'total loss', 'on fire', 'heart attack', 'accident', 'no shelter'
+    ]):
         return "Critical"
-    if any(word in text for word in ['food', 'water', 'shelter', 'trapped']):
+
+    # --- HIGH (Survival Urgency / Serious Risk) ---
+    if any(word in text for word in [
+        'no food', 'skipped meals', 'emergency shelter', 'cannot pay rent', 
+        'essential bills', 'serious injury', 'one set clothing', 'temporary camp', 
+        'urgent help', 'starving', 'severe pain', 'dehydration'
+    ]):
         return "High"
-    return "Medium"
+
+    # --- MEDIUM (Manageable Stress / Basic Need) ---
+    if any(word in text for word in [
+        'income loss', 'moderate injury', 'fever', 'safe shelter', 
+        'temporary stay', 'need help', 'damage', 'repair', '1-2 days', 
+        'medicine', 'blankets', 'clothes'
+    ]):
+        return "Medium"
+
+    return "Low"
 
 @lru_cache(maxsize=128)
 def predict_priority(text):
     """
-    Leverages Google Gemini LLM for nuanced situational understanding.
-    Strictly follows the platform's priority matrix.
+    Robust situational classifier using detailed semantic contrast.
+    Focuses on the severity of the human condition (Safety/Hunger/Shelter).
     """
     if not text or len(text.strip()) < 5:
         return "Low"
 
-    if not HAS_GEMINI:
-        return keyword_analysis(text)
-
-    # Detailed System Prompt based on user matrix
-    prompt = f"""
-    You are a disaster welfare priority analyzer. Categorize the following request into one of these levels: Critical, High, Medium, or Low.
+    # 1. Keyword analysis provides a reliable "floor" or direct hit
+    manual_check = keyword_analysis(text)
     
-    Use these STRICT rules based on our Priority Matrix:
-    1. FOOD: Critical if starvation risk (not eaten for days). High if no food today. Medium if 1-2 days left. 
-    2. MEDICAL: Critical if life-threatening (bleeding, unconscious). High if serious injury. Medium if fever or moderate injury.
-    3. SHELTER: Critical if completely homeless/total loss. High if staying in camps/outside.
-    4. FINANCIAL: Critical if immediate eviction. High if cannot pay essential bills.
-    5. OTHERS: Critical if immediate danger/emergency. High if urgent help for vulnerable person.
+    # Critical keywords always override AI for safety
+    if manual_check == "Critical":
+        return "Critical"
 
-    Request Description: "{text}"
+    if not HAS_MODEL:
+        return manual_check
 
-    Return ONLY the category word (Critical, High, Medium, or Low). Do NOT provide any explanation.
-    """
-
+    # 2. Precise labels for AI classification
+    label_map = {
+        "Immediate life-threatening medical emergency or starvation": "Critical",
+        "Direct survival risk like no food today or total displacement": "High",
+        "Non-emergency resource shortage with 1-2 days buffer": "Medium",
+        "General inquiry or minor non-urgent assistance": "Low"
+    }
+    descriptive_labels = list(label_map.keys())
+    
     try:
-        response = model.generate_content(prompt)
-        result = response.text.strip().capitalize()
+        # Use semantic classification
+        result = classifier(text, candidate_labels=descriptive_labels)
+        ai_label = label_map[result['labels'][0]]
+        ai_score = result['scores'][0]
         
-        valid_priorities = ["Critical", "High", "Medium", "Low"]
-        for p in valid_priorities:
-            if p in result:
-                return p
-        return "Low"
+        # Priority mapping for comparison
+        rank = {"Critical": 4, "High": 3, "Medium": 2, "Low": 1}
+        
+        # If AI is confident (score > 0.4), take the highest of manual vs AI
+        if ai_score > 0.4:
+            return ai_label if rank[ai_label] > rank[manual_check] else manual_check
+        
+        return manual_check
     except Exception as e:
-        print(f"Gemini Prediction Error: {e}")
-        return keyword_analysis(text)
+        print(f"AI Robustness Error: {e}")
+        return manual_check
+
+
+

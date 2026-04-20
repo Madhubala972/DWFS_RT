@@ -28,7 +28,7 @@ const calculatePriority = (requestData, aiPrediction = 'Low') => {
     const final = results[priority] || results['Low'];
     return { 
         score: final.score, 
-        priority: priority, 
+        priority: results[priority] ? priority : 'Low', 
         explanation: final.explanation 
     };
 };

@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
-const Request = require('./server/models/Request');
+const Request = require('./models/Request');
 
-dotenv.config({ path: path.join(__dirname, 'server', '.env') });
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const checkStats = async () => {
     try {

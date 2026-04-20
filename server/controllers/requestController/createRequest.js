@@ -6,11 +6,13 @@ const { calculatePriority } = require('../../utils/priorityHelper');
 
 const getAiPriority = async (description) => {
     try {
-        const baseUrl = process.env.AI_SERVICE_URL || 'http://localhost:5001';
-        const url = `${baseUrl.replace(/\/$/, '')}/predict`;
-        const response = await axios.post(url, { description });
+        let baseUrl = process.env.AI_SERVICE_URL || 'http://localhost:5001';
+        // Handle case where .env already includes /predict
+        const url = baseUrl.endsWith('/predict') ? baseUrl : `${baseUrl.replace(/\/$/, '')}/predict`;
+        const response = await axios.post(url, { description }, { timeout: 5000 });
         return response.data.priority || 'Low';
     } catch (err) {
+        console.error(`AI Analysis Error [${err.code || err.message}]: Falling back to Low priority.`);
         return 'Low';
     }
 };
@@ -36,7 +38,7 @@ const createRequest = asyncHandler(async (req, res) => {
     // 1. Initial Priority (Before AI)
     const { score: initScore, priority: initPrio, explanation: initExpl } = calculatePriority({
         type, vulnerability, locationRisk
-    }, 'Pending');
+    }, 'Low');
 
     const request = await Request.create({
         user: req.user._id, type, description, quantity, city, location, pincode,

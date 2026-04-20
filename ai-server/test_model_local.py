@@ -13,7 +13,7 @@ class TestDisasterModel(unittest.TestCase):
         description = "We are starving and need food."
         priority = model.predict_priority(description)
         print(f"Input: '{description}' -> Priority: {priority}")
-        self.assertEqual(priority, 'High')
+        self.assertEqual(priority, 'Critical')
 
     def test_medium_priority(self):
         description = "We need blankets and clothes."

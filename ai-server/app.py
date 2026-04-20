@@ -1,11 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from model import predict_priority
-from dotenv import load_dotenv
-import os
-
-# Load environment variables
-load_dotenv()
+import model
 
 app = Flask(__name__)
 CORS(app)
@@ -23,6 +18,7 @@ def predict():
         return jsonify({'error': 'No description provided'}), 400
     
     priority = model.predict_priority(description)
+    print(f"DEBUG: Processing '{description[:50]}...' -> Result: {priority}")
     return jsonify({'priority': priority})
 
 import os
