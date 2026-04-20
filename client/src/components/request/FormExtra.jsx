@@ -15,9 +15,9 @@ const FormExtra = ({ formData, setFormData }) => (
             </div>
         </div>
         <div className="flex flex-col gap-2">
-            <label className="flex items-center gap-2"><input type="checkbox" checked={formData.vulnerability.elderly} onChange={(e) => setFormData({ ...formData, vulnerability: { ...formData.vulnerability, elderly: e.target.checked } })} /> Elderly in family</label>
-            <label className="flex items-center gap-2"><input type="checkbox" checked={formData.vulnerability.disabled} onChange={(e) => setFormData({ ...formData, vulnerability: { ...formData.vulnerability, disabled: e.target.checked } })} /> Disabled persons</label>
-            <label className="flex items-center gap-2"><input type="checkbox" checked={formData.locationRisk === 'High'} onChange={(e) => setFormData({ ...formData, locationRisk: e.target.checked ? 'High' : 'Normal' })} /> High risk zone (Flood/Fire)</label>
+            <label className="flex items-center gap-2"><input type="checkbox" checked={formData.vulnerability.hasElderly} onChange={(e) => setFormData({ ...formData, vulnerability: { ...formData.vulnerability, hasElderly: e.target.checked } })} /> Elderly in family</label>
+            <label className="flex items-center gap-2"><input type="checkbox" checked={formData.vulnerability.hasDisabled} onChange={(e) => setFormData({ ...formData, vulnerability: { ...formData.vulnerability, hasDisabled: e.target.checked } })} /> Disabled persons</label>
+            <label className="flex items-center gap-2"><input type="checkbox" checked={formData.locationRisk.isFloodZone} onChange={(e) => setFormData({ ...formData, locationRisk: { ...formData.locationRisk, isFloodZone: e.target.checked } })} /> High risk zone (Flood/Fire)</label>
         </div>
     </div>
 );

@@ -14,8 +14,8 @@ const RequestHelp = () => {
         city: '',
         location: '',
         pincode: '',
-        vulnerability: { elderly: false, disabled: false },
-        locationRisk: 'Normal'
+        vulnerability: { hasElderly: false, hasDisabled: false },
+        locationRisk: { isFloodZone: false, isDroughtArea: false }
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
