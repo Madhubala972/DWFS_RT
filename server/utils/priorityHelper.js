@@ -2,41 +2,34 @@ const calculatePriority = (requestData, aiPrediction = 'Low') => {
     let score = 0;
     const reasons = [];
 
-    // --- 1. ABSOLUTE CRITICAL (Life-Safety & Hazard) ---
+    // --- Base Priority from Nuanced AI Analysis ---
+    let priority = aiPrediction || 'Low';
+    
     const isVulnerable = requestData.vulnerability?.hasElderly || requestData.vulnerability?.hasDisabled;
     const isDisasterZone = requestData.locationRisk?.isFloodZone || requestData.locationRisk?.isDroughtArea;
 
-    if (aiPrediction === 'Critical' || requestData.type === 'Medical' || (requestData.type === 'Food' && (isVulnerable || isDisasterZone))) {
-        return { 
-            score: 100, 
-            priority: 'Critical', 
-            explanation: `IMMEDIATE ACTION REQUIRED: ${aiPrediction === 'Critical' ? 'Critical hazard detected.' : requestData.type === 'Medical' ? 'Medical assistance requested.' : 'Food shortage in high-risk/vulnerable situation.'}` 
-        };
+    // --- Contextual Boosters (Upgrading priority based on Risk) ---
+    if (priority === 'High' && (isVulnerable || isDisasterZone)) {
+        priority = 'Critical'; // Survival risk + Vulnerability = Critical
+    } else if (priority === 'Medium' && (isVulnerable || isDisasterZone)) {
+        priority = 'High'; // Manageable issue + Vulnerability = High
+    } else if (priority === 'Low' && isVulnerable) {
+        priority = 'Medium'; // Non-urgent + Elderly/Disabled = Medium
     }
 
-    // --- 2. HIGH PRIORITY (Urgent Survival Needs) ---
-    if (requestData.type === 'Food' || aiPrediction === 'High') {
-        return { 
-            score: 75, 
-            priority: 'High', 
-            explanation: 'URGENT RESOURCE NEED: Necessary supplies for survival and nutrition identified.' 
-        };
-    }
+    // --- Final Output Mapping ---
+    const results = {
+        'Critical': { score: 100, explanation: `CRITICAL: ${aiPrediction === 'Critical' ? 'Immediate life/safety risk identified.' : 'High-risk situation for vulnerable/displaced member.'}` },
+        'High': { score: 75, explanation: `HIGH: ${aiPrediction === 'High' ? 'Significant survival/resource deprivation.' : 'Risk elevated due to environmental factors.'}` },
+        'Medium': { score: 50, explanation: `MEDIUM: ${isVulnerable ? 'Priority assistance for elderly/disabled.' : 'Resource shortage with moderate urgency.'}` },
+        'Low': { score: 25, explanation: 'LOW: Routine request with no immediate safety or survival risk detected.' }
+    };
 
-    // --- 3. MEDIUM PRIORITY (Vulnerability & Basic Needs) ---
-    if (['Essentials', 'Funds'].includes(requestData.type) || isVulnerable || aiPrediction === 'High' || aiPrediction === 'Medium') {
-        return { 
-            score: 50, 
-            priority: 'Medium', 
-            explanation: 'PRIORITY SUPPORT: Request involving vulnerable individuals or essential household supplies.' 
-        };
-    }
-
-    // --- 4. LOW PRIORITY (Routine Distributions) ---
+    const final = results[priority] || results['Low'];
     return { 
-        score: 25, 
-        priority: 'Low', 
-        explanation: 'NORMAL LOGISTICS: Standard request for distribution items.' 
+        score: final.score, 
+        priority: priority, 
+        explanation: final.explanation 
     };
 };
 

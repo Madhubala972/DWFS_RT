@@ -13,39 +13,61 @@ except Exception as e:
 
 def keyword_analysis(text):
     text = text.lower()
-    # 1. HAZARD / LIFE-SAFETY (Absolute Critical)
-    if any(word in text for word in ['accident', 'fire', 'flood', 'bleeding', 'blood', 'trapped', 'dying', 'emergency', 'unconscious', 'collapsed', 'breathing', 'heart', 'injured', 'broken', 'stroke', 'seizure']):
+    
+    # --- CRITICAL (Life-Threatening / Total Loss) ---
+    critical_words = [
+        'starvation', 'not eaten for days', 'eviction', 'immediate danger',
+        'heavy bleeding', 'unconscious', 'no safe place to stay', 'completely homeless',
+        'lost in disaster', 'total loss', 'immediate emergency'
+    ]
+    if any(word in text for word in critical_words):
         return "Critical"
-    # 2. SURVIVAL NEEDS (High)
-    if any(word in text for word in ['starving', 'starvation', 'hungry', 'food', 'water', 'shelter', 'medicine', 'fever', 'rescue', 'orphan']):
+
+    # --- HIGH (Survival Risk / Displacement) ---
+    high_words = [
+        'no food', 'skipped meals', 'cannot pay rent', 'essential bills',
+        'serious injury', 'one set of clothing', 'staying outside', 'temporary camp',
+        'urgent help', 'rescue needed'
+    ]
+    if any(word in text for word in high_words):
         return "High"
-    # 3. BASIC SUPPLIES (Medium)
-    if any(word in text for word in ['blankets', 'clothes', 'diapers', 'sanitary', 'kits', 'shoes', 'soap']):
+
+    # --- MEDIUM (Manageable but Urgent) ---
+    medium_words = [
+        '1-2 days', 'income loss', 'basic needs manageable', 'fever',
+        'moderate injury', 'damage', 'not safe long term', 'arranging transport'
+    ]
+    if any(word in text for word in medium_words):
         return "Medium"
+
     return "Low"
 
 @lru_cache(maxsize=128)
 def predict_priority(text):
     """
-    Categorizes the situation based on hazard level and survival urgency.
+    Nuanced categorization based on the specific condition thresholds:
+    Critical: Starvation, Eviction, Life-threatening, Total homelessness
+    High: No food/skipped meals, Bills/Rent debt, Serious injury, Displacement
+    Medium: Limited resources (1-2 days), Manageable illness, Damaged shelter
+    Low: Minor issues, general info, or additional help requests
     """
     if not text or len(text.strip()) < 5:
         return "Low"
 
-    # Precise Hazard Keywords check
+    # Nuanced Manual Keyword Pass
     manual_check = keyword_analysis(text)
-    if manual_check == "Critical":
-        return "Critical"
+    if manual_check != "Low":
+        return manual_check
 
     if not HAS_MODEL:
         return manual_check
 
-    # AI Model labels updated for better distinction
+    # Labels updated with the specific examples from the user
     label_map = {
-        "Life-threatening emergency, high-risk hazard, accident or active natural disaster": "Critical",
-        "Urgent survival necessity like severe hunger, thirst or medical sickness": "High",
-        "Non-emergency need for items, supplies or temporary shelter": "Medium",
-        "General inquiry, low priority information or routine check-in": "Low"
+        "Starvation risk, immediate eviction, life-threatening injury or total homelessness": "Critical",
+        "No food today, cannot pay essential bills, serious injury or staying in camps": "High",
+        "Limited food (1-2 days), income loss but manageable, fever or safe temporary shelter": "Medium",
+        "General inquiry, minor issues like headaches or needs additional non-urgent items": "Low"
     }
     descriptive_labels = list(label_map.keys())
     
