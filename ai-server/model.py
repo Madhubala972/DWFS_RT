@@ -13,30 +13,40 @@ except Exception as e:
 
 def keyword_analysis(text):
     text = text.lower()
-    if any(word in text for word in ['emergency', 'critical', 'dying', 'accident', 'medical', 'hospital', 'bleeding', 'breath']):
+    # 1. HAZARD / LIFE-SAFETY (Absolute Critical)
+    if any(word in text for word in ['accident', 'fire', 'flood', 'bleeding', 'blood', 'trapped', 'dying', 'emergency', 'unconscious', 'collapsed', 'breathing', 'heart']):
         return "Critical"
-    if any(word in text for word in ['starving', 'hungry', 'food', 'water', 'thirsty', 'shelter', 'homeless']):
+    # 2. SURVIVAL NEEDS (High)
+    if any(word in text for word in ['starving', 'hungry', 'food', 'water', 'shelter', 'medicine', 'fever', 'rescue']):
         return "High"
-    if any(word in text for word in ['blanket', 'clothes', 'supplies', 'medicine', 'fever', 'cold', 'diaper']):
+    # 3. BASIC SUPPLIES (Medium)
+    if any(word in text for word in ['blankets', 'clothes', 'diapers', 'sanitary', 'kits']):
         return "Medium"
     return "Low"
 
 @lru_cache(maxsize=128)
 def predict_priority(text):
     """
-    Predicts priority using NLP model or keyword fallback.
+    Categorizes the situation based on hazard level and survival urgency.
+    Bypasses point-based systems for absolute safety.
     """
     if not text or len(text.strip()) < 5:
         return "Low"
 
-    if not HAS_MODEL:
-        return keyword_analysis(text)
+    # Precise Hazard Keywords check (Fastest)
+    manual_check = keyword_analysis(text)
+    if manual_check == "Critical":
+        return "Critical"
 
+    if not HAS_MODEL:
+        return manual_check
+
+    # AI Model labels updated for situational hazard detection
     label_map = {
-        "Immediate Life-Threatening rescue or medical emergency": "Critical",
-        "Urgent requirement for food or shelter": "High",
-        "Need for clothing, blankets or basic supplies": "Medium",
-        "General inquiry or low priority information": "Low"
+        "Life-threatening emergency, hazard, accident or natural disaster": "Critical",
+        "Survival necessity like hunger, thirst or medical illness": "High",
+        "Need for basic items, supplies or shelter": "Medium",
+        "General inquiry or low priority request": "Low"
     }
     descriptive_labels = list(label_map.keys())
     
@@ -44,8 +54,7 @@ def predict_priority(text):
         result = classifier(text, candidate_labels=descriptive_labels)
         best_match = result['labels'][0]
         return label_map[best_match]
-        
     except Exception as e:
         print(f"AI Prediction Error: {e}")
-        return keyword_analysis(text)
+        return manual_check
 
