@@ -13,13 +13,13 @@ const calculatePriority = (requestData, aiPrediction = 'Low') => {
     score += aiScore;
     reasons.push(`AI Analysis (${aiPrediction}): +${aiScore}`);
 
-    // 2. Resource Type Necessity
+    // 2. Resource Type Necessity (Direct Impact on Priority)
     const emergencyTypes = {
-        'Medical': 15,
-        'Food': 12,
-        'Essentials': 8,
-        'Funds': 5,
-        'Clothes': 3,
+        'Medical': 60,   // Immediate health risk
+        'Food': 35,      // Survival necessity
+        'Essentials': 20, // Hygiene/Safety
+        'Funds': 10,     // Logistics
+        'Clothes': 5,    // Comfort
         'Other': 2
     };
     const typeScore = emergencyTypes[requestData.type] || 0;
