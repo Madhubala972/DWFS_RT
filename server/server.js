@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const connectDB = require('./config/db');
+const morgan = require('morgan');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 // Load environment variables
