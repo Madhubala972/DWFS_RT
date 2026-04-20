@@ -40,10 +40,14 @@ const createRequest = asyncHandler(async (req, res) => {
         type, vulnerability, locationRisk
     }, 'Low');
 
+    // Bulletproof Sanitizer
+    const allowedPriorities = ['Low', 'Medium', 'High', 'Critical', 'Pending'];
+    const finalPriority = allowedPriorities.includes(initPrio) ? initPrio : 'Low';
+
     const request = await Request.create({
         user: req.user._id, type, description, quantity, city, location, pincode,
         vulnerability, locationRisk,
-        status: 'Pending', priority: initPrio, priorityScore: initScore, priorityExplanation: initExpl
+        status: 'Pending', priority: finalPriority, priorityScore: initScore, priorityExplanation: initExpl
     });
 
     // 2. Return immediate response
@@ -57,17 +61,19 @@ const createRequest = asyncHandler(async (req, res) => {
                 type, vulnerability, locationRisk
             }, aiPrediction);
             
+            // Background update safely uses the new priority
             await Request.findByIdAndUpdate(request._id, {
-                priority, priorityScore: score, priorityExplanation: explanation
+                priority: allowedPriorities.includes(priority) ? priority : 'Low',
+                priorityScore: score, 
+                priorityExplanation: explanation
             });
-            console.log(`Background AI update complete for request ${request._id}`);
         } catch (err) {
             console.error('Background AI update failed:', err);
         }
     })();
 
     const { clearStatsCache } = require('../statsController');
-    clearStatsCache(); // Ensure dashboard reflects new data instantly
+    clearStatsCache(); 
 
     await logActivity(req.user._id, 'CREATE_REQUEST', `New request: ${type}`, request._id, 'Request', req.ip);
 });
