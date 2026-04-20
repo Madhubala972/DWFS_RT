@@ -4,8 +4,8 @@ from transformers import pipeline
 
 print("Loading Fast NLP Model... (Optimized for speed)")
 try:
-    # Use a well-known model name
-    classifier = pipeline("zero-shot-classification", model="valhalla/distilbart-mnli-12-3")
+    # Use a faster, lighter distilled model for quicker CPU inference
+    classifier = pipeline("zero-shot-classification", model="typeform/distilbert-base-uncased-mnli")
     HAS_MODEL = True
 except Exception as e:
     print(f"Failed to load NLP model: {e}. Falling back to Keyword Analysis.")

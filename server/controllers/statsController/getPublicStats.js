@@ -7,7 +7,7 @@ const Request = require('../../models/Request');
 
 // Simple In-Memory Cache (TTL: 1 minute)
 const statsCache = new Map();
-const CACHE_TTL = 60 * 1000;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minute cache for high performance
 
 const getTimeParams = async (timeframe) => {
     let startDate = new Date(); startDate.setHours(0, 0, 0, 0);

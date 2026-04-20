@@ -90,8 +90,9 @@ requestSchema.index({ status: 1 });
 requestSchema.index({ priority: 1 });
 requestSchema.index({ user: 1 });
 requestSchema.index({ assignedTo: 1 });
-requestSchema.index({ createdAt: -1 }); // Optimize timeline & recent queries
-requestSchema.index({ deliveredAt: -1 }); // Optimize delivery stats
+requestSchema.index({ createdAt: -1, type: 1 }); // Optimize timeline by type
+requestSchema.index({ status: 1, priority: 1 }); // Optimize urgent request queries
+requestSchema.index({ deliveredAt: -1, assignedTo: 1 }); // Optimize NGO/Volunteer performance stats
 
 const Request = mongoose.model('Request', requestSchema);
 
