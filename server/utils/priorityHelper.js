@@ -53,7 +53,7 @@ const calculatePriority = (requestData, aiPrediction = 'Low') => {
 
     // Final Mapping
     let priority = 'Low';
-    if (score >= 75) priority = 'Critical';
+    if (score >= 71) priority = 'Critical';
     else if (score >= 50) priority = 'High';
     else if (score >= 25) priority = 'Medium';
 
