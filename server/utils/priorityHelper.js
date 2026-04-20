@@ -4,8 +4,8 @@ const calculatePriority = (requestData, aiPrediction = 'Low') => {
 
     // 1. AI Content Analysis (Emergency Sentiment from ML Model)
     const aiServiceWeights = {
-        'Critical': 45,
-        'High': 35,
+        'Critical': 55,
+        'High': 40,
         'Medium': 20,
         'Low': 5
     };
@@ -35,7 +35,7 @@ const calculatePriority = (requestData, aiPrediction = 'Low') => {
         score += 15;
         reasons.push('Disability present: +15');
     }
-    const famBonus = Math.min(requestData.vulnerability?.familySize * 2, 10);
+    const famBonus = Math.min((requestData.vulnerability?.familySize || 0) * 2, 10);
     if (famBonus > 0) {
         score += famBonus;
         reasons.push(`Household size (${requestData.vulnerability?.familySize}): +${famBonus}`);
@@ -53,9 +53,9 @@ const calculatePriority = (requestData, aiPrediction = 'Low') => {
 
     // Final Mapping
     let priority = 'Low';
-    if (score >= 80) priority = 'Critical';
-    else if (score >= 55) priority = 'High';
-    else if (score >= 30) priority = 'Medium';
+    if (score >= 75) priority = 'Critical';
+    else if (score >= 50) priority = 'High';
+    else if (score >= 25) priority = 'Medium';
 
     return { score, priority, explanation: reasons.join(' | ') };
 };

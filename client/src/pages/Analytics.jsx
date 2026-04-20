@@ -49,7 +49,11 @@ const Analytics = () => {
         </div>
     );
 
-    const priorityData = stats ? Object.entries(stats.byPriority).map(([name, value]) => ({ name, value })) : [];
+    const priorityOrder = ['Critical', 'High', 'Medium', 'Low'];
+    const priorityData = stats ? priorityOrder.map(name => ({
+        name,
+        value: stats.byPriority[name] || 0
+    })) : [];
 
     return (
         <div className="bg-gray-50 min-h-screen pb-20">

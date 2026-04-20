@@ -1,4 +1,4 @@
-const Request = require('../models/Request');
+const Request = require('../../models/Request');
 const asyncHandler = require('express-async-handler');
 
 // Lightweight summary for UI notifications and status bars

@@ -11,9 +11,15 @@ const PriorityChart = ({ priorityData }) => (
                     <YAxis dataKey="name" type="category" width={100} fontSize={12} />
                     <Tooltip cursor={{ fill: '#f8fafc' }} />
                     <Bar dataKey="value" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={32}>
-                        {priorityData.map((e, i) => (
-                            <Cell key={i} fill={e.name === 'Critical' ? '#dc2626' : e.name === 'High' ? '#ea580c' : '#2563eb'} />
-                        ))}
+                        {priorityData.map((e, i) => {
+                            const colors = {
+                                'Critical': '#dc2626', // Red
+                                'High': '#ea580c',     // Orange
+                                'Medium': '#2563eb',   // Blue
+                                'Low': '#94a3b8'       // Slate
+                            };
+                            return <Cell key={i} fill={colors[e.name] || '#3b82f6'} />;
+                        })}
                     </Bar>
                 </BarChart>
             </ResponsiveContainer>

@@ -14,10 +14,15 @@ const getDistribution = async () => {
         return res;
     };
 
+    const byPriority = format(priorityCounts);
+    ['Critical', 'High', 'Medium', 'Low'].forEach(p => {
+        if (!byPriority[p]) byPriority[p] = 0;
+    });
+
     return {
         total,
         byStatus: format(statusCounts),
-        byPriority: format(priorityCounts),
+        byPriority,
         byType: format(typeCounts)
     };
 };

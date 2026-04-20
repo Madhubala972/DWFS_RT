@@ -8,14 +8,21 @@ const updateRequest = asyncHandler(async (req, res) => {
         throw new Error('Request not found');
     }
 
+    // Role-based Access Control
     if (!['admin', 'ngo', 'volunteer'].includes(req.user.role)) {
         res.status(401);
-        throw new Error('Not authorized');
+        throw new Error('Not authorized to update requests');
     }
 
-    if (req.body.status === 'Approved' && request.priority === 'Critical' && req.user.role !== 'admin') {
-        res.status(403);
-        throw new Error('Critical requests require Admin approval');
+    // Critical Priority Governance Rule:
+    // "Critical" requests MUST be approved/rejected by Admin only.
+    // "High", "Medium", "Low" can be handled by NGO/Volunteers.
+    if (request.priority === 'Critical' && req.user.role !== 'admin') {
+        const isStatusChange = req.body.status && req.body.status !== request.status;
+        if (isStatusChange && ['Approved', 'Rejected'].includes(req.body.status)) {
+            res.status(403);
+            throw new Error('Action restricted: Critical requests require Admin intervention');
+        }
     }
 
     Object.assign(request, req.body);
