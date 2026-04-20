@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Pre-download the model weights during the build process to speed up container startup
 # This ensures Hugging Face downloads happen at build time, not runtime
-RUN python -c "from transformers import pipeline; pipeline('zero-shot-classification', model='cross-encoder/nli-MiniLM-L6-v2')"
+RUN python -c "from transformers import pipeline; pipeline('zero-shot-classification', model='typeform/distilbert-base-uncased-mnli')"
 
 # Copy the rest of the application code
 COPY . .
