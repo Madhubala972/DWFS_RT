@@ -2,42 +2,41 @@ const calculatePriority = (requestData, aiPrediction = 'Low') => {
     let score = 0;
     const reasons = [];
 
-    // --- 1. ABSOLUTE CRITICAL (Hazard / Accident / Disaster Short-circuit) ---
-    // If AI detects a life-safety hazard, it is Critical. No other points matter.
-    if (aiPrediction === 'Critical') {
+    // --- 1. ABSOLUTE CRITICAL (Life-Safety & Hazard) ---
+    const isVulnerable = requestData.vulnerability?.hasElderly || requestData.vulnerability?.hasDisabled;
+    const isDisasterZone = requestData.locationRisk?.isFloodZone || requestData.locationRisk?.isDroughtArea;
+
+    if (aiPrediction === 'Critical' || requestData.type === 'Medical' || (requestData.type === 'Food' && (isVulnerable || isDisasterZone))) {
         return { 
             score: 100, 
             priority: 'Critical', 
-            explanation: 'SITUATIONAL HAZARD DETECTED: Life-threatening emergency or accident identified by AI analysis.' 
+            explanation: `IMMEDIATE ACTION REQUIRED: ${aiPrediction === 'Critical' ? 'Critical hazard detected.' : requestData.type === 'Medical' ? 'Medical assistance requested.' : 'Food shortage in high-risk/vulnerable situation.'}` 
         };
     }
 
-    // --- 2. HIGH PRIORITY (Survival Resource Needs) ---
-    // If resource is Medical or Food, it is at least High.
-    if (['Medical', 'Food'].includes(requestData.type)) {
+    // --- 2. HIGH PRIORITY (Urgent Survival Needs) ---
+    if (requestData.type === 'Food' || aiPrediction === 'High') {
         return { 
-            score: 70, 
+            score: 75, 
             priority: 'High', 
-            explanation: 'SURVIVAL RESOURCE NEED: Immediate requirement for healthcare or nutrition.' 
+            explanation: 'URGENT RESOURCE NEED: Necessary supplies for survival and nutrition identified.' 
         };
     }
 
     // --- 3. MEDIUM PRIORITY (Vulnerability & Basic Needs) ---
-    // If resource is Essentials/Funds OR there are vulnerable groups.
-    const isVulnerable = requestData.vulnerability?.hasElderly || requestData.vulnerability?.hasDisabled;
-    if (['Essentials', 'Funds'].includes(requestData.type) || isVulnerable || aiPrediction === 'High') {
+    if (['Essentials', 'Funds'].includes(requestData.type) || isVulnerable || aiPrediction === 'High' || aiPrediction === 'Medium') {
         return { 
-            score: 45, 
+            score: 50, 
             priority: 'Medium', 
-            explanation: 'VULNERABILITY/SUPPLY NEED: Request involves vulnerable dependents or essential logistics.' 
+            explanation: 'PRIORITY SUPPORT: Request involving vulnerable individuals or essential household supplies.' 
         };
     }
 
-    // --- 4. LOW PRIORITY (Standard Distributions) ---
+    // --- 4. LOW PRIORITY (Routine Distributions) ---
     return { 
-        score: 15, 
+        score: 25, 
         priority: 'Low', 
-        explanation: 'NORMAL PRIORITY: Standard request for non-urgent supplies or information.' 
+        explanation: 'NORMAL LOGISTICS: Standard request for distribution items.' 
     };
 };
 

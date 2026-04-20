@@ -14,13 +14,13 @@ except Exception as e:
 def keyword_analysis(text):
     text = text.lower()
     # 1. HAZARD / LIFE-SAFETY (Absolute Critical)
-    if any(word in text for word in ['accident', 'fire', 'flood', 'bleeding', 'blood', 'trapped', 'dying', 'emergency', 'unconscious', 'collapsed', 'breathing', 'heart']):
+    if any(word in text for word in ['accident', 'fire', 'flood', 'bleeding', 'blood', 'trapped', 'dying', 'emergency', 'unconscious', 'collapsed', 'breathing', 'heart', 'injured', 'broken', 'stroke', 'seizure']):
         return "Critical"
     # 2. SURVIVAL NEEDS (High)
-    if any(word in text for word in ['starving', 'hungry', 'food', 'water', 'shelter', 'medicine', 'fever', 'rescue']):
+    if any(word in text for word in ['starving', 'starvation', 'hungry', 'food', 'water', 'shelter', 'medicine', 'fever', 'rescue', 'orphan']):
         return "High"
     # 3. BASIC SUPPLIES (Medium)
-    if any(word in text for word in ['blankets', 'clothes', 'diapers', 'sanitary', 'kits']):
+    if any(word in text for word in ['blankets', 'clothes', 'diapers', 'sanitary', 'kits', 'shoes', 'soap']):
         return "Medium"
     return "Low"
 
@@ -28,12 +28,11 @@ def keyword_analysis(text):
 def predict_priority(text):
     """
     Categorizes the situation based on hazard level and survival urgency.
-    Bypasses point-based systems for absolute safety.
     """
     if not text or len(text.strip()) < 5:
         return "Low"
 
-    # Precise Hazard Keywords check (Fastest)
+    # Precise Hazard Keywords check
     manual_check = keyword_analysis(text)
     if manual_check == "Critical":
         return "Critical"
@@ -41,12 +40,12 @@ def predict_priority(text):
     if not HAS_MODEL:
         return manual_check
 
-    # AI Model labels updated for situational hazard detection
+    # AI Model labels updated for better distinction
     label_map = {
-        "Life-threatening emergency, hazard, accident or natural disaster": "Critical",
-        "Survival necessity like hunger, thirst or medical illness": "High",
-        "Need for basic items, supplies or shelter": "Medium",
-        "General inquiry or low priority request": "Low"
+        "Life-threatening emergency, high-risk hazard, accident or active natural disaster": "Critical",
+        "Urgent survival necessity like severe hunger, thirst or medical sickness": "High",
+        "Non-emergency need for items, supplies or temporary shelter": "Medium",
+        "General inquiry, low priority information or routine check-in": "Low"
     }
     descriptive_labels = list(label_map.keys())
     
