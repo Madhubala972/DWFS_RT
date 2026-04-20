@@ -35,14 +35,10 @@ const createRequest = asyncHandler(async (req, res) => {
         throw new Error('Pincode must be exactly 6 digits');
     }
 
-    console.log('DEBUG: Received Request Body:', JSON.stringify(req.body, null, 2));
-
     // 1. Initial Priority (Before AI)
     const { score: initScore, priority: initPrio, explanation: initExpl } = calculatePriority({
         type, vulnerability, locationRisk
     }, 'Low');
-
-    console.log('DEBUG: Calculated Initial Priority:', initPrio);
 
     const request = await Request.create({
         user: req.user._id, type, description, quantity, city, location, pincode,
