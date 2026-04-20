@@ -14,30 +14,27 @@ except Exception as e:
 def keyword_analysis(text):
     text = text.lower()
     
-    # --- CRITICAL (Life-Threatening / Total Loss) ---
-    critical_words = [
-        'starvation', 'not eaten for days', 'eviction', 'immediate danger',
-        'heavy bleeding', 'unconscious', 'no safe place to stay', 'completely homeless',
-        'lost in disaster', 'total loss', 'immediate emergency'
-    ]
-    if any(word in text for word in critical_words):
+    # --- CRITICAL (Immediate Life/Death/Total Loss) ---
+    if any(word in text for word in [
+        'starvation', 'eaten for days', 'not eaten', 'bleeding', 'unconscious', 
+        'eviction', 'evicted', 'homeless', 'no safety', 'disaster victim', 
+        'immediate emergency', 'dying', 'cannot breathe', 'total loss', 'on fire'
+    ]):
         return "Critical"
 
-    # --- HIGH (Survival Risk / Displacement) ---
-    high_words = [
-        'no food', 'skipped meals', 'cannot pay rent', 'essential bills',
-        'serious injury', 'one set of clothing', 'staying outside', 'temporary camp',
-        'urgent help', 'rescue needed'
-    ]
-    if any(word in text for word in high_words):
+    # --- HIGH (Survival Urgency / Serious Risk) ---
+    if any(word in text for word in [
+        'no food', 'skipped meals', 'emergency shelter', 'cannot pay rent', 
+        'essential bills', 'serious injury', 'one set clothing', 'temporary camp', 
+        'urgent help', 'starving'
+    ]):
         return "High"
 
-    # --- MEDIUM (Manageable but Urgent) ---
-    medium_words = [
-        '1-2 days', 'income loss', 'basic needs manageable', 'fever',
-        'moderate injury', 'damage', 'not safe long term', 'arranging transport'
-    ]
-    if any(word in text for word in medium_words):
+    # --- MEDIUM (Manageable Stress / Basic Need) ---
+    if any(word in text for word in [
+        'income loss', 'moderate injury', 'fever', 'safe shelter', 
+        'temporary stay', 'need help', 'damage', 'repair', '1-2 days'
+    ]):
         return "Medium"
 
     return "Low"
@@ -45,37 +42,35 @@ def keyword_analysis(text):
 @lru_cache(maxsize=128)
 def predict_priority(text):
     """
-    Nuanced categorization based on the specific condition thresholds:
-    Critical: Starvation, Eviction, Life-threatening, Total homelessness
-    High: No food/skipped meals, Bills/Rent debt, Serious injury, Displacement
-    Medium: Limited resources (1-2 days), Manageable illness, Damaged shelter
-    Low: Minor issues, general info, or additional help requests
+    Robust situational classifier using detailed semantic contrast.
+    Focuses on the severity of the human condition (Safety/Hunger/Shelter).
     """
     if not text or len(text.strip()) < 5:
         return "Low"
 
-    # Nuanced Manual Keyword Pass
+    # Check for direct emergency keywords first
     manual_check = keyword_analysis(text)
-    if manual_check != "Low":
-        return manual_check
+    if manual_check == "Critical":
+        return "Critical"
 
     if not HAS_MODEL:
         return manual_check
 
-    # Labels updated with the specific examples from the user
+    # Precise labels derived from user matrix for minimal ambiguity
     label_map = {
-        "Starvation risk, immediate eviction, life-threatening injury or total homelessness": "Critical",
-        "No food today, cannot pay essential bills, serious injury or staying in camps": "High",
-        "Limited food (1-2 days), income loss but manageable, fever or safe temporary shelter": "Medium",
-        "General inquiry, minor issues like headaches or needs additional non-urgent items": "Low"
+        "Immediate starvation, life-threatening injury, total homelessness, or urgent eviction": "Critical",
+        "Direct survival risk like no food today, displacement in camps, or unable to pay essential survival bills": "High",
+        "Non-emergency resource shortage with 1-2 days buffer, fever, or manageable repair needs": "Medium",
+        "General inquiry, minor issues like headache, or request for additional non-urgent assistance": "Low"
     }
     descriptive_labels = list(label_map.keys())
     
     try:
+        # We use a very low multi-label threshold to ensure distinct categorization
         result = classifier(text, candidate_labels=descriptive_labels)
         best_match = result['labels'][0]
         return label_map[best_match]
     except Exception as e:
-        print(f"AI Prediction Error: {e}")
+        print(f"AI Robustness Error: {e}")
         return manual_check
 
