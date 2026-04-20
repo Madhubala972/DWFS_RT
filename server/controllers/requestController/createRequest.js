@@ -40,6 +40,8 @@ const createRequest = asyncHandler(async (req, res) => {
         type, vulnerability, locationRisk
     }, 'Low');
 
+    console.log(`DEBUG: Initial calculated priority for new request: ${initPrio}`);
+
     const request = await Request.create({
         user: req.user._id, type, description, quantity, city, location, pincode,
         vulnerability, locationRisk,

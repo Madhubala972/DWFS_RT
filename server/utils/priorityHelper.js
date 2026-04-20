@@ -26,9 +26,14 @@ const calculatePriority = (requestData, aiPrediction = 'Low') => {
     };
 
     const final = results[priority] || results['Low'];
+    
+    // Safety check: ensure we only return standard priority strings
+    const validPriorities = ['Critical', 'High', 'Medium', 'Low'];
+    const finalPriority = validPriorities.includes(priority) ? priority : 'Low';
+
     return { 
         score: final.score, 
-        priority: results[priority] ? priority : 'Low', 
+        priority: finalPriority, 
         explanation: final.explanation 
     };
 };
