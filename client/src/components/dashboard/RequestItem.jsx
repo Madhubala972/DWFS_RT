@@ -1,6 +1,6 @@
 import DeliveryTracker from '../DeliveryTracker';
 
-const RequestItem = ({ req, user, updateStatus }) => {
+const RequestItem = ({ req, user, updateStatus, deliveryProof, onProofChange }) => {
     const priorityColors = {
         'Critical': 'border-l-red-600',
         'High': 'border-l-indigo-600',

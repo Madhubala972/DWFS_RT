@@ -1,4 +1,4 @@
-const RequestActions = ({ req, user, updateStatus }) => {
+const RequestActions = ({ req, user, updateStatus, deliveryProof, onProofChange }) => {
     if (!['admin', 'ngo', 'volunteer'].includes(user.role)) return null;
 
     const isPending = req.status === 'Pending';
@@ -21,10 +21,23 @@ const RequestActions = ({ req, user, updateStatus }) => {
                     </>
                 )
             )}
-            {isApproved && <button onClick={() => updateStatus(req._id, 'Assigned')} className="bg-blue-600 text-white px-8 py-2 rounded-lg font-bold text-sm">Accept for Delivery</button>}
+            {isApproved && <button onClick={() => updateStatus(req._id, 'Assigned')} className="bg-blue-600 text-white px-8 py-2 rounded-lg font-bold text-sm hover:bg-blue-700 transition-colors shadow-lg shadow-blue-100">Accept for Delivery</button>}
             {isAssigned && (
-                <div className="flex flex-col sm:flex-row gap-3 w-full">
-                    <button onClick={() => updateStatus(req._id, 'Delivered')} className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-xl font-bold text-base w-full transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-200">
+                <div className="w-full space-y-4">
+                    <div className="flex flex-col gap-2">
+                        <label className="text-[10px] font-black text-blue-600 uppercase tracking-widest px-1">Delivery Notes</label>
+                        <textarea 
+                            placeholder="Add details about the delivery completion..." 
+                            className="w-full border border-gray-200 p-4 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none bg-gray-50/50" 
+                            rows="2"
+                            value={deliveryProof[req._id] || ''} 
+                            onChange={(e) => onProofChange(req._id, e.target.value)}
+                        />
+                    </div>
+                    <button 
+                        onClick={() => updateStatus(req._id, 'Delivered', { deliveryNotes: deliveryProof[req._id] })} 
+                        className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-2xl font-bold text-base w-full transition-all flex items-center justify-center gap-2 shadow-xl shadow-green-200 active:scale-95"
+                    >
                         <span>✔</span> Finalize & Complete Delivery
                     </button>
                 </div>

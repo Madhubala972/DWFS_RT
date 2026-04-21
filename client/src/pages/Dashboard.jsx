@@ -9,6 +9,7 @@ import UrgentNeedsModal from '../components/UrgentNeedsModal';
 const Dashboard = () => {
     const { requests, user, updateStatus } = useDashboard();
     const [filter, setFilter] = useState('All');
+    const [deliveryProof, setDeliveryProof] = useState({});
 
     const filtered = useMemo(() => requests.filter(req => {
         if (filter === 'All') return true;
@@ -30,8 +31,8 @@ const Dashboard = () => {
                         <ul className="divide-y">
                             {filtered.map(req => (
                                 <div key={req._id}>
-                                    <RequestItem req={req} user={user} updateStatus={updateStatus} />
-                                    <RequestActions req={req} user={user} updateStatus={updateStatus} />
+                                    <RequestItem req={req} user={user} updateStatus={updateStatus} deliveryProof={deliveryProof} onProofChange={(id, v) => setDeliveryProof({ ...deliveryProof, [id]: v })} />
+                                    <RequestActions req={req} user={user} updateStatus={updateStatus} deliveryProof={deliveryProof} onProofChange={(id, v) => setDeliveryProof({ ...deliveryProof, [id]: v })} />
                                 </div>
                             ))}
                         </ul>
