@@ -1,6 +1,6 @@
 import DeliveryTracker from '../DeliveryTracker';
 
-const RequestItem = ({ req, user, updateStatus, deliveryProof, onProofChange }) => {
+const RequestItem = ({ req, user, updateStatus }) => {
     const priorityColors = {
         'Critical': 'border-l-red-600',
         'High': 'border-l-indigo-600',
@@ -31,26 +31,6 @@ const RequestItem = ({ req, user, updateStatus, deliveryProof, onProofChange }) 
                 <p className="bg-gray-50 px-2 py-1 rounded">Added {new Date(req.createdAt).toLocaleDateString()}</p>
             </div>
             <div className="mt-6"><DeliveryTracker status={req.status} /></div>
-            
-            {req.status === 'Delivered' && req.proofOfDelivery && (
-                <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-100">
-                    <h4 className="text-xs font-bold text-green-700 uppercase mb-2">📦 Proof of Delivery</h4>
-                    <div className="flex flex-col sm:flex-row gap-4 items-start">
-                        <div className="w-32 h-32 rounded-lg bg-gray-200 overflow-hidden shadow-sm flex-shrink-0 border border-green-200">
-                            <img 
-                                src={(import.meta.env.VITE_API_URL || 'http://localhost:5000') + req.proofOfDelivery} 
-                                alt="Proof of Delivery" 
-                                className="w-full h-full object-cover cursor-zoom-in"
-                                onClick={() => window.open((import.meta.env.VITE_API_URL || 'http://localhost:5000') + req.proofOfDelivery, '_blank')}
-                            />
-                        </div>
-                        <div className="flex-1">
-                            <p className="text-sm text-green-800 italic">"{req.deliveryNotes || 'No delivery notes provided.'}"</p>
-                            <p className="mt-2 text-[10px] font-bold text-green-600 uppercase">Delivered on {new Date(req.deliveredAt).toLocaleString()}</p>
-                        </div>
-                    </div>
-                </div>
-            )}
         </li>
     );
 };

@@ -51,6 +51,3 @@ out/
 # OS metadata
 .DS_Store
 Thumbs.db
-
-# User Uploads
-server/uploads/
