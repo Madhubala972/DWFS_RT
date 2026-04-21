@@ -19,13 +19,24 @@ export const useDashboard = () => {
 
     const updateStatus = async (id, status, extraData = {}) => {
         try {
-            const payload = { status, ...extraData };
+            let payload = { status, ...extraData };
+
+            // Handle Image Upload if proof is provided
+            if (extraData.deliveryImage) {
+                const formData = new FormData();
+                formData.append('image', extraData.deliveryImage);
+                const { data: uploadData } = await api.post('/api/upload', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                payload.proofOfDelivery = uploadData.url;
+                delete payload.deliveryImage;
+            }
+
             if (status === 'Assigned' && user.role === 'volunteer') payload.assignedTo = user._id;
             await api.put(`/api/requests/${id}`, payload);
             alert(`Request updated to ${status}`);
             fetchRequests(user);
         } catch (error) {
-// ...
             alert(`Error: ${error.response?.data?.message || error.message}`);
         }
     };

@@ -10,6 +10,7 @@ const Dashboard = () => {
     const { requests, user, updateStatus } = useDashboard();
     const [filter, setFilter] = useState('All');
     const [deliveryProof, setDeliveryProof] = useState({});
+    const [deliveryImages, setDeliveryImages] = useState({});
 
     const filtered = useMemo(() => requests.filter(req => {
         if (filter === 'All') return true;
@@ -32,7 +33,15 @@ const Dashboard = () => {
                             {filtered.map(req => (
                                 <div key={req._id}>
                                     <RequestItem req={req} user={user} updateStatus={updateStatus} deliveryProof={deliveryProof} onProofChange={(id, v) => setDeliveryProof({ ...deliveryProof, [id]: v })} />
-                                    <RequestActions req={req} user={user} updateStatus={updateStatus} deliveryProof={deliveryProof} onProofChange={(id, v) => setDeliveryProof({ ...deliveryProof, [id]: v })} />
+                                    <RequestActions 
+                                        req={req} 
+                                        user={user} 
+                                        updateStatus={updateStatus} 
+                                        deliveryProof={deliveryProof} 
+                                        onProofChange={(id, v) => setDeliveryProof({ ...deliveryProof, [id]: v })}
+                                        deliveryImage={deliveryImages[req._id]}
+                                        onImageChange={(id, v) => setDeliveryImages({ ...deliveryImages, [id]: v })} 
+                                    />
                                 </div>
                             ))}
                         </ul>

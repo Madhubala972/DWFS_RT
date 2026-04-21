@@ -1,4 +1,6 @@
 const express = require('express');
+const path = require('path');
+
 const dotenv = require('dotenv');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -31,6 +33,9 @@ app.get('/', (req, res) => {
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/requests', require('./routes/requestRoutes'));
 app.use('/api/logs', require('./routes/logRoutes'));
+app.use('/api/upload', require('./routes/uploadRoutes'));
+
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 // app.use('/api/admin', require('./routes/adminRoutes'));
 
 app.use(notFound);
